@@ -1,0 +1,51 @@
+[
+	
+	{
+		"title"			: "Noticia 1",
+		"description"	: "Descrição da notícia 1",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	},
+
+	{
+		"title"			: "Noticia 2",
+		"description"	: "Descrição da notícia 2",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	},
+
+	{
+		"title"			: "Noticia 3",
+		"description"	: "Descrição da notícia 3",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	},
+
+	{
+		"title"			: "Noticia 4",
+		"description"	: "Descrição da notícia 4",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	},
+
+	{
+		"title"			: "Noticia 5",
+		"description"	: "Descrição da notícia 5",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	},
+
+	{
+		"title"			: "Noticia 6",
+		"description"	: "Descrição da notícia 6",
+		"date"			: "09 de Janeiro de 2015",
+		"news" 			: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum ullam quod, ex expedita eius optio soluta deserunt quia nostrum, quo itaque nam eaque dolorum doloribus distinctio! Dignissimos corporis delectus sapiente.",
+		"author"		: "Igor Fernandes"
+	}
+
+]

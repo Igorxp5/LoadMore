@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="UTF-8">
+	<title>Load More - Testes</title>
+</head>
+<body>
+	
+	<h1>Load More</h1>
+		
+	<section>
+		<h2>Notícias</h2>
+		<p>Veja aqui as principais notícias do dia.</p>
+		<div id="noticias">
+			<div id="baseElement">
+				<h1 data-loadmore="title"></h1>
+				<p data-loadmore="description"></p>
+				<article data-loadmore="news"></article>
+				<span data-loadmore="date"></span>
+			</div>
+		</div>
+	
+		<button id="buttonLoadMore">Load More</button>
+	
+	</section>
+
+	<script src="js/loadMore.min.js"></script>
+
+	<script>
+
+		/*
+			Estrtura exemplo( Base Element )
+			//o elemento que vai conter todos os itens deve SOMENTE CONTER OS ITENS
+			//deve ser colocado nos elementos que sofreram alteração um atributo chamado data-loadmore="{COLOQUE AQUI A INDEX QUE SERÁ COLOCADA AQUI}"
+			//o id do baseElement sera apagado
+			<div id="baseElement">
+				<h1 data-loadmore="title"></h1>
+				<p data-loadmore="description"></p>
+				<article data-loadmore="news"></article>
+				<span data-loadmore="date"></span>
+			</div>
+
+
+			//Objeto não pode ser bidimensional ou multidimensional
+
+			//Array exemplo
+
+			[
+
+				{
+					title: 'Noticia 1',
+					description: 'Descrição 1',
+					news: 	'News 1',
+					date: '1 Janeiro de 2015'
+				},
+
+				{
+					title: 'Noticia 2',
+					description: 'Descrição 2',
+					news: 	'News 2',
+					date: '2 Janeiro de 2015'
+				},
+
+				{
+					title: 'Noticia 3',
+					description: 'Descrição 3',
+					news: 	'News 3',
+					date: '3 Janeiro de 2015'
+				},
+
+				{
+					title: 'Noticia 4',
+					description: 'Descrição 4',
+					news: 	'News 4',
+					date: '4 Janeiro de 2015'
+				}
+
+			]
+		 */
+
+		var news = document.querySelector('#noticias');
+
+
+		var loadMore = news.loadMore({
+			data: 'json/data.json', //array com itens, os itens devem serum objeto | O campo também pode ser uma url caso uma url o plugin carregara-lo antes *
+			itemsInit: 1, //nº itens iniciais
+			itemsPerLoad: 3, //nº itens a serem adicionados sempre quando for carregar mais itens
+			elementForLoad: '#buttonLoadMore',//elemento para que quando for clicado carregar mais itens 
+			baseElement: '#baseElement', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
+			localInput: {}, //objeto com o local onde vai ser colocado o valores vindos do data, em html ou em atributo, default "HTML", se for atributo escever o nome do atributo
+			minDelay: 0, //delay minimo para carregar o conteudo em milisegundos
+			onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
+				void(0);
+			},
+			onLoad: function(){ //terminar de carregar loadMore (mostrar novos items)
+				void(0);
+			},
+			onCompleted: function(){ //função à ser executada quando todos os itens já foram adicionados
+				void(0);
+			}
+		});
+		
+		// setTimeout(function(){
+		// 	//é possivel chamar a função loadMore em qualquer parte do seu código
+		// 	loadMore.loadMore({title: 'Noticia 3'});
+		// }, 3000);
+
+	</script>
+
+</body>
+</html>
