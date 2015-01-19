@@ -3,7 +3,7 @@
  *
  * LCS
  *
- * Version:  1.0-dev
+ * Version:  1.1-dev
  *
  */
 
@@ -297,51 +297,42 @@ var lm = {
 			//adicionando em objUsed
 			objUsed.push(current);
 
+			//split do replacer
+			var spReplacer = (this.i.replacer).split('%s%');
+
 			var item = (lm.i.baseElement).cloneNode(true);
 
-			var allElements = item.querySelectorAll('*');
+			//elemento principal html
+			var itemHTML = item.innerHTML;
+
+			//attributes do elemento principal
+			var attributes = item.attributes;
+
 			//for das keys dentro de cada value do array
 			for( var k in current ){
-
-				//split do replacer
-				var spReplacer = (this.i.replacer).split('%s%');
-
+				
 				//replacer usando o nome do objeto
 				var replacer = spReplacer[0]+k+spReplacer[1];
 
-				//for dos elementos dentro de item
-				for (var j = 0; j < allElements.length; j++) {
+				itemHTML = itemHTML.replace(replacer, current[k]);
 
-					var currentElement = allElements[j];
+				//for dos attributes
+					
+					for( var a = 0; a < attributes.length; a++){
 
-					//html do elemento atual
-					var html = currentElement.innerHTML;
-
-					//verifica se existe o {{@%s%}}
-					if( html.search(replacer) != -1){
-						html = html.replace(replacer, current[k]);
-						currentElement.innerHTML = html;
-					}
-
-					var attributes = currentElement.attributes;
-
-					//for dos atributos do elemento do laço atual
-					for (var l = 0; l < attributes.length; l++) {
-						//nome do atributo
-						var attribute = attributes[l].nodeName;
-						//valor do atributo
-						var value = attributes[l].value;
+						var attribute = attributes[a].nodeName;
+						var value = attributes[a].value;
 
 						if( value.search(replacer) != -1 ){
-							value = value.replace(replacer, current[k]);
-							currentElement.setAttribute(attribute, value);
+							item.setAttribute(attribute, current[k]);
 						}
+
 					}
-
-				}
-
-
+					
 			}//end for das keys
+
+			//alterando o html do item
+			item.innerHTML = itemHTML;
 
 			items.appendChild(item);
 
