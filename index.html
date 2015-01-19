@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Load More - Testes</title>
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 	
@@ -13,10 +14,10 @@
 		<p>Veja aqui as principais notícias do dia.</p>
 		<div id="noticias">
 			<div id="baseElement">
-				<h1 data-loadmore="title"></h1>
-				<p data-loadmore="description"></p>
-				<article data-loadmore="news"></article>
-				<span data-loadmore="date"></span>
+				<h1>{{@title}}</h1>
+				<p>{{@description}}</p>
+				<article>{{@news}}</article>
+				<span>{{@date}}</span>
 			</div>
 		</div>
 	
@@ -24,7 +25,7 @@
 	
 	</section>
 
-	<script src="js/loadMore.min.js"></script>
+	<script src="js/loadMore.js"></script>
 
 	<script>
 
@@ -34,10 +35,10 @@
 			//deve ser colocado nos elementos que sofreram alteração um atributo chamado data-loadmore="{COLOQUE AQUI A INDEX QUE SERÁ COLOCADA AQUI}"
 			//o id do baseElement sera apagado
 			<div id="baseElement">
-				<h1 data-loadmore="title"></h1>
-				<p data-loadmore="description"></p>
-				<article data-loadmore="news"></article>
-				<span data-loadmore="date"></span>
+				<h1>{{@title}}</h1>
+				<p>{{@description}}</p>
+				<article>{{@news}}</article>
+				<span>{{@date}}</span>
 			</div>
 
 
@@ -87,7 +88,6 @@
 			itemsPerLoad: 3, //nº itens a serem adicionados sempre quando for carregar mais itens
 			elementForLoad: '#buttonLoadMore',//elemento para que quando for clicado carregar mais itens 
 			baseElement: '#baseElement', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
-			localInput: {}, //objeto com o local onde vai ser colocado o valores vindos do data, em html ou em atributo, default "HTML", se for atributo escever o nome do atributo
 			minDelay: 0, //delay minimo para carregar o conteudo em milisegundos
 			onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
 				void(0);

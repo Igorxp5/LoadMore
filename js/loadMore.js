@@ -1,3 +1,13 @@
+/*
+ * Load More - Plugin for load more after
+ *
+ * LCS
+ *
+ * Version:  1.0-dev
+ *
+ */
+
+
 /*jslint browser:true */
 'use strict';
 
@@ -20,7 +30,6 @@ var lm = {
 		itemsPerLoad: 1, //nº itens a serem adicionados sempre quando for carregar mais itens
 		elementForLoad: '',//elemento para que quando for clicado carregar mais itens 
 		baseElement: '', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
-		localInput: {}, //objeto com o local onde vai ser colocado o valores vindos do data, em html ou em atributo, default "HTML", se for atributo escever o nome do atributo
 		minDelay: 1000, //delay minimo para carregar o conteudo em milisegundos
 		onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
 			void(0);
@@ -38,6 +47,7 @@ var lm = {
 	i: {
 		data: '',
 		attributeForKeys: 'data-loadmore',
+		replacer: '{{@%s%}}',
 
 		getJSON: function(url, successHandler, errorHandler) {
 
@@ -289,28 +299,45 @@ var lm = {
 
 			var item = (lm.i.baseElement).cloneNode(true);
 
+			var allElements = item.querySelectorAll('*');
 			//for das keys dentro de cada value do array
-			for( var k in obj[i] ){
+			for( var k in current ){
 
-				//verifica se existe um elemento dentro do base com a atributo igual á key
-				var keyElement = item.querySelector('*['+lm.i.attributeForKeys+'='+k+']');
+				//split do replacer
+				var spReplacer = (this.i.replacer).split('%s%');
 
-				if( keyElement ){
-					keyElement.removeAttribute(lm.i.attributeForKeys);
-					if( localInput[k] != undefined ){
+				//replacer usando o nome do objeto
+				var replacer = spReplacer[0]+k+spReplacer[1];
 
-						if(typeof localInput[k] == 'array'){
-							for( var j in localInput[k] ){
-								var attr = localInput[k][j];
-								keyElement.setAttribute(attr, current[k]);
-							}
-						}
-						else if( typeof localInput[k] == 'string')
-							keyElement.setAttribute(localInput[k], current[k]);
+				//for dos elementos dentro de item
+				for (var j = 0; j < allElements.length; j++) {
 
+					var currentElement = allElements[j];
+
+					//html do elemento atual
+					var html = currentElement.innerHTML;
+
+					//verifica se existe o {{@%s%}}
+					if( html.search(replacer) != -1){
+						html = html.replace(replacer, current[k]);
+						currentElement.innerHTML = html;
 					}
-					else
-						keyElement.innerHTML = current[k];
+
+					var attributes = currentElement.attributes;
+
+					//for dos atributos do elemento do laço atual
+					for (var l = 0; l < attributes.length; l++) {
+						//nome do atributo
+						var attribute = attributes[l].nodeName;
+						//valor do atributo
+						var value = attributes[l].value;
+
+						if( value.search(replacer) != -1 ){
+							value = value.replace(replacer, current[k]);
+							currentElement.setAttribute(attribute, value);
+						}
+					}
+
 				}
 
 
