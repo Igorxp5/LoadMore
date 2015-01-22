@@ -314,7 +314,7 @@ var lm = {
 				//replacer usando o nome do objeto
 				var replacer = spReplacer[0]+k+spReplacer[1];
 
-				itemHTML = itemHTML.replace(replacer, current[k]);
+				itemHTML = itemHTML.replace(new RegExp(replacer, 'g'), current[k]);
 
 				//for dos attributes
 					
