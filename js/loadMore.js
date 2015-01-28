@@ -141,9 +141,9 @@ var lm = {
 					lm.c[key] = params[key];
 
 				}
-			}//end for
+			}
 
-		}//end if params
+		}//end for
 
 		lm.adjustmentsInVar();
 		lm.createBaseElement();
@@ -283,13 +283,9 @@ var lm = {
 		//se existir o search, vai ser feito uma procura para só colocar objetos com determinados value em suas keys
 		if( Object.keys(search).length > 0 ){
 			var newObj = lm.sF.search(objInitial, search);
-			obj = (newObj != -1) ? newObj : {};
+			obj = (newObj != -1) ? newObj : objInitial;
 		}else
 			obj = objInitial;
-
-		//se o objeto estiver vazio cancelar a função
-		if( Object.keys(obj).length == 0 )
-			return false;
 
 		var objUsed = [];
 
