@@ -107,7 +107,7 @@ Valor númerico em ``ms``, definindo o tempo mínimo entre o chamar da função 
 
 
 ##autoAddition
-Propriedade tipo boolean, define o auto adicionamento dos itens carregados ao elemento principal.
+Propriedade tipo ``boolean``, define o auto adicionamento dos itens carregados ao elemento principal.
 
 **Default:** ``autoAddition: true``
 
@@ -124,7 +124,7 @@ function(){
 
 
 ##onLoad
-Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for concluída. Está função retorna o(s) elemento(s) carrgado(s) pelo LoadMore
+Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for concluída. Está função retorna o(s) elemento(s) carrgado(s) pelo LoadMore.
 
 **Default:** 
 ```js
