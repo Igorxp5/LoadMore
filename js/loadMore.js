@@ -3,7 +3,7 @@
  *
  * LCS
  *
- * Version:  1.1-dev
+ * Version:  1.2-dev
  *
  */
 
