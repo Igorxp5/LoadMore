@@ -194,16 +194,11 @@ var lm = {
 		if( typeof (lm.c.data) != 'string' && typeof (lm.c.data) != 'object' )
 			lm.clError('The data property must be of number type or string type(url).');
 
-		if( typeof (lm.c.data) != 'object' ){
-			
-			if( (lm.c.data).search('http') == -1 ){
-				var url = document.location;
-				(lm.c.data) = url+'/'+(lm.c.data);
+		if( (lm.c.data).search('http') == -1 ){
+			var url = document.location;
+			(lm.c.data) = url+'/'+(lm.c.data);
 
-			}
-			
 		}
-
 
 	}, //end adjustmentsInVar
 
@@ -213,12 +208,6 @@ var lm = {
 	},
 
 	getArray: function(){
-
-		if( typeof (lm.c.data) == 'object' ){
-			lm.i.data = lm.c.data;
-			lm.initConfigs();
-			return true;
-		}
 
 		lm.i.getJSON(lm.c.data, function(data){
 			lm.i.data = data;
