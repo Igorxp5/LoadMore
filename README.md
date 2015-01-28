@@ -1,4 +1,4 @@
-# Load More 1.1
+# Load More 1.3
 
 O **Load More** é um plugin que permite o desenvolvimento de um sistema em que o número de dados há ser carregados é muito grande, sendo necessário o uso de um botão para **"carregar mais"**. 
 
@@ -106,6 +106,11 @@ Valor númerico em ``ms``, definindo o tempo mínimo entre o chamar da função 
 **Default:** ``minDelay: 1000``
 
 
+##autoAddition
+Propriedade tipo boolean, define o auto adicionamento dos itens carregados ao elemento principal.
+
+**Default:** ``autoAddition: true``
+
 
 ##onClickForLoad
 Propriedade do tipo ``function``, esta função será chamada se o evento click do **elementForLoad** for chamado.
@@ -119,11 +124,11 @@ function(){
 
 
 ##onLoad
-Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for concluída.
+Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for concluída. Está função retorna o(s) elemento(s) carrgado(s) pelo LoadMore
 
 **Default:** 
 ```js
-function(){ 
+function(items){ 
 	void(0);
 }
 ```

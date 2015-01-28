@@ -3,7 +3,7 @@
  *
  * LCS
  *
- * Version:  1.2-dev
+ * Version:  1.3-dev
  *
  */
 
@@ -30,6 +30,7 @@ var lm = {
 		itemsPerLoad: 1, //nº itens a serem adicionados sempre quando for carregar mais itens
 		elementForLoad: '',//elemento para que quando for clicado carregar mais itens 
 		baseElement: '', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
+		autoAddition: true,//default true, define se o plugin adicionará automaticamente os novos itens
 		minDelay: 1000, //delay minimo para carregar o conteudo em milisegundos
 		onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
 			void(0);
@@ -253,7 +254,7 @@ var lm = {
 
 	},
 
-	loadMore: function(search, itemsToLoad, localInput, minDelay){
+	loadMore: function(search, itemsToLoad, minDelay){
 
 		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;
 
@@ -272,9 +273,6 @@ var lm = {
 
 		if( !(itemsToLoad != undefined && typeof itemsToLoad == 'number') )
 			itemsToLoad = lm.c.itemsPerLoad;
-
-		if( !(localInput != undefined && typeof localInput == 'object') )
-			localInput = lm.c.localInput;
 
 		if( !(minDelay != undefined && typeof minDelay == 'number') )
 			minDelay = lm.c.minDelay;
@@ -342,8 +340,13 @@ var lm = {
 
 		//delay min para inserir
 		setTimeout(function(){
-			lm.insertNewValuesOnHTML(items.innerHTML, obj.length);
-			lm.c.onLoad();
+			if( lm.c.autoAddition == true )
+				lm.insertNewValuesOnHTML(items.innerHTML, obj.length);
+
+			//Retorna o(s) elemento(s) obitidos pelo loadMore
+			var returnOnLoad = (itemsToLoad == 1) ?  items.childNodes[0] : items.childNodes;
+
+			lm.c.onLoad(returnOnLoad);
 		}, minDelay);
 
 	},
@@ -359,18 +362,18 @@ function classLm(){
 	this.i = lm.i;
 }
 
-classLm.prototype.loadMore = function(search, itemsToLoad, localInput, minDelay){
+classLm.prototype.loadMore = function(search, itemsToLoad, minDelay){
 
 	if( typeof this.i.data != 'object' ){
 		
 		this.i.getJSON(this.i.data, function(data){
 			this.i.data = data;
-			lm.loadMore(search, itemsToLoad, localInput, minDelay);
+			lm.loadMore(search, itemsToLoad, minDelay);
 		},function(){
 			console.error("loadMore - Couldn't get the data of the file: "+this.i.data);
 		});
 
 	}else
-		lm.loadMore(search, itemsToLoad, localInput, minDelay);
+		lm.loadMore(search, itemsToLoad, minDelay);
 
 }
