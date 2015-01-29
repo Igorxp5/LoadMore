@@ -35,7 +35,7 @@ var lm = {
 		onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
 			void(0);
 		},
-		onLoad: function(){ //terminar de carregar loadMore (mostrar novos itens)
+		onLoad: function(items){ //terminar de carregar loadMore (mostrar novos itens)
 			void(0);
 		},
 		onCompleted: function(){ //função à ser executada quando todos os itens já foram adicionados
@@ -195,10 +195,14 @@ var lm = {
 		if( typeof (lm.c.data) != 'string' && typeof (lm.c.data) != 'object' )
 			lm.clError('The data property must be of number type or string type(url).');
 
-		if( (lm.c.data).search('http') == -1 ){
-			var url = document.location;
-			(lm.c.data) = url+'/'+(lm.c.data);
+		if( typeof (lm.c.data) == 'string' ){
 
+			if( (lm.c.data).search('http') == -1 ){
+				var url = document.location;
+				(lm.c.data) = url+'/'+(lm.c.data);
+
+			}
+			
 		}
 
 	}, //end adjustmentsInVar
@@ -209,6 +213,12 @@ var lm = {
 	},
 
 	getArray: function(){
+
+		if( typeof (lm.c.data) == 'object' ){
+			lm.i.data = lm.c.data;
+			lm.initConfigs();
+			return true;
+		}
 
 		lm.i.getJSON(lm.c.data, function(data){
 			lm.i.data = data;
@@ -256,7 +266,7 @@ var lm = {
 
 	loadMore: function(search, itemsToLoad, minDelay){
 
-		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;			
+		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;
 
 		//html do elemento que vai ser inserido no final do for
 		var items = document.createElement('div');
@@ -265,10 +275,8 @@ var lm = {
 		if( objInitial == undefined || typeof objInitial != 'object'){
 			return false;
 		}
-		if( objInitial.length == 0 ){
-			lm.c.onCompleted();
+		if( objInitial.length == 0 )
 			return false;
-		}
 
 		if( !(search != undefined && typeof search == 'object') )
 			search = {};
