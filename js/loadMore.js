@@ -354,7 +354,14 @@ var lm = {
 				lm.insertNewValuesOnHTML(items.innerHTML, obj.length);
 
 			//Retorna o(s) elemento(s) obitidos pelo loadMore
-			var returnOnLoad = (itemsToLoad == 1) ?  items.childNodes[0] : items.childNodes;
+			var itemsOnLoad = [];
+			for (var i = ((lm.c.el).childNodes).length - 1; i >= ((lm.c.el).childNodes).length - itemsToLoad; i--) {
+				var currentCN = ((lm.c.el).childNodes)[i];
+
+				itemsOnLoad.push(currentCN);
+
+			};
+			var returnOnLoad = itemsOnLoad;
 
 			lm.c.onLoad(returnOnLoad);
 		}, minDelay);
