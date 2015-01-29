@@ -266,7 +266,7 @@ var lm = {
 
 	loadMore: function(search, itemsToLoad, minDelay){
 
-		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;
+		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;			
 
 		//html do elemento que vai ser inserido no final do for
 		var items = document.createElement('div');
@@ -275,8 +275,10 @@ var lm = {
 		if( objInitial == undefined || typeof objInitial != 'object'){
 			return false;
 		}
-		if( objInitial.length == 0 )
+		if( objInitial.length == 0 ){
+			lm.c.onCompleted();
 			return false;
+		}
 
 		if( !(search != undefined && typeof search == 'object') )
 			search = {};
