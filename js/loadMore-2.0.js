@@ -255,7 +255,7 @@ function loadMore(elementGot, parameters)
 		//Code: 3
 		'Can not find the element with selector equal: %s%',
 		//Code: 4
-		"Select the effect in the parameter effectOnLoadItems, the your value can't be equal true"
+		"Select the effect in the parameter effectOnLoadItems, the your value can't be equal true",
 		//Code: 5
 		"Not exists this effect, the available effects are: "+availableEffects.toString()
 	];
