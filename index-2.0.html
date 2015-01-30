@@ -81,11 +81,12 @@
 
 		var news = document.querySelector('#noticias');
 
-		var $content = news.loadMore({
+		var $loadMore = news.loadMore({
 			config: {
 				object: 'json/data.json',
 			},
-			baseElement: '#baseElement'
+			baseElement: '#baseElement',
+			buttonToLoadMore: '#buttonLoadMore'
 		});
 		
 		// setTimeout(function(){
@@ -93,7 +94,7 @@
 		// 	loadMore.loadMore({title: 'Noticia 3'});
 		// }, 3000);
 
-		console.log($content);
+		console.log($loadMore);
 
 	</script>
 
