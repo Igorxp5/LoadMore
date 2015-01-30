@@ -26,15 +26,15 @@ function loadMore(elementGot, parameters)
 	var pluginVersion = '2.1';
 
 	var requireParameters = [
-		'data',
+		'config',
 		'baseElement'
 	];
 	//Var of settings default
 	var settings = {
-		data: {
+		config: {
 			object: '',								//Object or URL contain JSON
 			method: 'GET',							//Requisition method to obatin the data
-			postParameters: ''						//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
+			requestData: null								//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
 		},				
 		itemsInit: 1,								//Items to show in firt loadMore
 		itemsPerLoad: 1,							//Items to display per load
@@ -74,10 +74,10 @@ function loadMore(elementGot, parameters)
 
 
 	var mainElement,
-		data 				= null,							//Object or URL contain JSON
+		url 				= null,							//Object or URL contain JSON
 		object 				= new Object(),					//Variable to is use in all project
 		dataMethod			= 'GET',						//Requisition method to obatin the data
-		postParameters 		= '',							//Form data to send with requisition method POST, only dataMethod = POST
+		requestData 		= '',							//Form data to send with requisition method POST, only dataMethod = POST
 		baseElement 		= null, 						//Template Element
 		itemsInit 			= 1, 							//Items to show in firt loadMore
 		buttonToLoadMore 	= null,							//Element with onclick = loadMore function
@@ -125,18 +125,15 @@ function loadMore(elementGot, parameters)
 		
 		itemsInit 				= checkSameType('itemsInit', itemsInit, settings.itemsInit);
 
-		dataMethod 				= checkSameType('Data - Method', dataMethod, settings.data.method);
-
-		postParameters 			= checkSameType('Data - Post Parameters', postParameters, settings.data.postParameters);
+		dataMethod 				= checkSameType('Data - Method', dataMethod, settings.config.method);
 
 
 		////End Adjust All ----------------------------------
 
 
 		//Adjust Data and GET JSON, 
-		var typeData = typeof settings.data;
+		var typeData = typeof settings.config.object;
 
-		var regexHTTP = /^(http:\/\/|https:\/\/)/;
 		if ( !_.alternateValueComparate(typeData, ['string', 'object']) ) {
 
 			throwError(2, {
@@ -144,17 +141,16 @@ function loadMore(elementGot, parameters)
 				'replace': ['Data - URL', 'string or object']
 			});
 
-		} else if ( (regexHTTP.exec(settings.data.object)) != null ) {
+		} else if ( typeData == 'string' ) {
 
-			data = settings.data.object;
+			var urlObject = _.urlObject(settings.config.object);
 
-		} else if ( (regexHTTP.exec(settings.data.object)) == null && typeData == 'string' ) {
 
-			data = document.location+settings.data.object;
+			url = urlObject['protocol'] + '//' + urlObject['host'] + urlObject['pathname'];
 
 		} else if ( typeData == 'object' ) {
 
-			object = settings.data.object;
+			object = settings.config.object;
 
 		}
 
@@ -241,15 +237,58 @@ function loadMore(elementGot, parameters)
 
 		//End Adjust effectOnLoadItems----------------------------------
 		
+		//Adjust postData
+		var typeRequestData = typeof settings.config.requestData;
+
+		if( requestData != null ) {
+
+			if ( typeRequestData != 'object' ) {
+				throwError(2, {
+					'find': ['%p%', '%t%'],
+					'replace': ['postData', 'object']
+				});
+			} else {
+
+				requestData =  settings.config.requestData;
+
+			}
+
+		}
+		
+
+
+
+
+		//End Adjust postData----------------------------------
+		
+		
 
 	}
+
+	//End setPluginVariables
+	
+	var getObjectData = function(callback) {
+		
+		if ( _.objLength(object) > 0 ) {
+			callback();
+			return true;
+		
+		} else {
+			_.requestAJAX(url, dataMethod.toLowerCase(), requestData, function(r){
+				callback(r);
+			});
+		}
+
+	}
+
+	//End getObject Data
 
 	//List of Errors
 	var errors = [
 		//Code: 0
 		'Not exists parameters in function loadMore',
 		//Code: 1
-		'The required parameters are '+requireParameters.toString(),
+		'The required parameters are '+requireParameters.join(', '),
 		//Code: 2	
 		'The parameter %p% must be of type %t%',
 		//Code: 3
@@ -257,7 +296,7 @@ function loadMore(elementGot, parameters)
 		//Code: 4
 		"Select the effect in the parameter effectOnLoadItems, the your value can't be equal true",
 		//Code: 5
-		"Not exists this effect, the available effects are: "+availableEffects.toString()
+		"Not exists this effect, the available effects are: "+availableEffects.join(', ')
 	];
 
 	var throwError = function(code, s) {
@@ -285,10 +324,10 @@ function loadMore(elementGot, parameters)
 				if ( Object.keys(parameters).indexOf(requireParameters[k]) != -1 ){
 					//Require Parameters with object
 					//Data require propertys
-					if( requireParameters[k] == 'data' ){
+					if( requireParameters[k] == 'config' ){
 
 						//Verify if exists parameters.data.url
-						if ( parameters.data.object != undefined ) {
+						if ( parameters.config.object != undefined ) {
 							checkedsParameters++;
 						}
 						//else go to next required parameter
@@ -304,8 +343,9 @@ function loadMore(elementGot, parameters)
 			}
 
 			//if not exists the required parameters return error
-			if( checkedsParameters != requireParameters.length )
+			if( checkedsParameters != requireParameters.length ){
 				throwError(1);
+			}
 
 			//checks were setted the required parameters
 			for (var key in parameters) {
@@ -333,7 +373,15 @@ function loadMore(elementGot, parameters)
 			throwError(0);
 		}
 
-		setPluginVariables();		
+		setPluginVariables(); //Adjust the variables and put in global variables
+		getObjectData(function(r){
+			if( r ) {
+				if ( typeof r != 'oject' ) {
+					object = JSON.parse(r);
+				}
+			}
+		});
+
 
 	}//end init
 
@@ -363,7 +411,7 @@ function loadMore(elementGot, parameters)
 			return !!(object && object.nodeType == 1);
 		},//end isElement
 
-		requestAJAX: function(url, method, data, callback, sync) {
+		requestAJAX: function(url, method, data, callback) {
 
 			var ajax = {};
 
@@ -390,9 +438,9 @@ function loadMore(elementGot, parameters)
 			    return xhr;
 			}
 
-			ajax.send = function(url, callback, method, data, sync) {
+			ajax.send = function(url, callback, method, data) {
 			    var x = ajax.x();
-			    x.open(method, url, sync);
+			    x.open(method, url);
 			    x.onreadystatechange = function() {
 			        if (x.readyState == 4) {
 			            callback(x.responseText)
@@ -404,23 +452,24 @@ function loadMore(elementGot, parameters)
 			    x.send(data)
 			}
 
-			ajax.get = function(url, data, callback, sync) {
+			ajax.get = function(url, data, callback) {
 			    var query = [];
 			    for (var key in data) {
 			        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
 			    }
-			    ajax.send(url + '?' + query.join('&'), callback, 'GET', null, sync)
+			    ajax.send(url + '?' + query.join('&'), callback, 'GET', null)
 			}
 
-			ajax.post = function(url, data, callback, sync) {
+			ajax.post = function(url, data, callback) {
 			    var query = [];
+
 			    for (var key in data) {
 			        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
 			    }
-			    ajax.send(url, callback, 'POST', query.join('&'), sync)
+			    ajax.send(url, callback, 'POST', query.join('&'));
 			}
 
-			ajax[method](url, data, callback, sync);
+			ajax[method](url, data, callback);
 
 		},//end RequestAJAX
 
@@ -451,7 +500,30 @@ function loadMore(elementGot, parameters)
 			}
 
 			return variable;
-		}
+		},
+
+		objLength: function(variable) {
+			return Object.keys(variable).length;
+		},
+
+		urlObject: function(url) {
+			var a = document.createElement('a');
+
+			a.setAttribute('href', url);
+
+			var urlObj = {
+		        protocol: a.protocol,
+		        hostname: a.hostname,
+		        host: a.host,
+		        port: a.port,
+		        hash: a.hash.substr(1),
+		        pathname: a.pathname,
+		        search: a.search
+		    };
+
+		    return urlObj;
+
+		} 
 
 
 
