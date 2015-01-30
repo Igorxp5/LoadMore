@@ -82,11 +82,8 @@
 		var news = document.querySelector('#noticias');
 
 		var $content = news.loadMore({
-			data: {
-				object: 'http://graofotos.com.br/categoria/json'
-			},
-			baseElement: '#baseElement',
-			effectOnLoadItems: 3
+			data: 'http://graofotos.com.br/categoria/json',
+			baseElement: '#buttonLoadMore'
 		});
 		
 		// setTimeout(function(){

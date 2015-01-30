@@ -13,13 +13,8 @@
 
 /*jslint browser:true */
 
-function loadMore(elementGot, parameters) 
-{
+function loadMore(elementGot, parameters) {
 	"use strict";
-
-	//Set Self
-	var self = this;
-
 
 	//Setting definitions of plugin
 	var pluginName = 'Load More';
@@ -31,17 +26,15 @@ function loadMore(elementGot, parameters)
 	];
 	//Var of settings default
 	var settings = {
-		data: {
-			object: '',								//Object or URL contain JSON
-			method: 'GET',							//Requisition method to obatin the data
-			postParameters: ''						//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
-		},				
-		itemsInit: 1,								//Items to show in firt loadMore
-		itemsPerLoad: 1,							//Items to display per load
+		data: '',				//Object or URL contain JSON
+		dataMethod: 'GET',		//Requisition method to obatin the data
+		postParameters: '',		//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
+		itemsInit: 1,			//Items to show in firt loadMore
+		itemsPerLoad: 1,
 		buttonToLoadMore: null,
-		baseElement: null,
+		baseElement: '',
 		minDelay: 0,
-		effectOnLoadItems: false,
+		effectOnLoadItems: '',
 		onLoadData: function(status) {
 			void(0);
 		},
@@ -65,213 +58,55 @@ function loadMore(elementGot, parameters)
 
 
 	//Declarate private variables
-	//
-	//Effects available to use
-	var availableEffects = [
-		'fadeIn',
-		'zoomIn'
-	];
-
-
 	var mainElement,
-		data 				= null,							//Object or URL contain JSON
-		object 				= new Object(),					//Variable to is use in all project
-		dataMethod			= 'GET',						//Requisition method to obatin the data
-		postParameters 		= '',							//Form data to send with requisition method POST, only dataMethod = POST
-		baseElement 		= null, 						//Template Element
-		itemsInit 			= 1, 							//Items to show in firt loadMore
-		buttonToLoadMore 	= null,							//Element with onclick = loadMore function
-		originalElement 	= null							//Element before the loadMore transformation
+		data, 							//Object or URL contain JSON
+		dataMethod = 'GET',				//Requisition method to obatin the data
+		postParameters = '',			//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
+		baseElement, 					//Template Element
+		itemsInit = 1, 					//Items to show in firt loadMore
+		originalElement; 				//Element before the loadMore transformation
 
 
 	//End Private Variables -----------------------------------
 
 
 	//Declarate public variables
-	this.minDelay 				= 0; 							//minimun delay to show elements on screen
-	this.itemsPerLoad 			= 1,							//Items to display per load
-	this.specificLoad			= null; 						//Load from a key equal a value
-	this.loadMoreTimes 			= 0;							//Number of times it was run loadMore function
-	this.effectOnLoadItems 		= false; 						//Effect to display when you load new items
+	this.minDelay = 1000; 						//minimun delay to show elements on screen
+	this.specificLoad = null; 			//Load from a key equal a value
+	this.loadMoreTimes = 0;						//Number of times it was run loadMore function
+	this.effectOnLoadItems = false; 			//Effect to display when you load new items
 
 
 	//End Public Variables -----------------------------------
 
 
 	//Declarate private functions
-	//Complment of variableNotExitType
-	var checkSameType = function(name, variable, value) {
-		var type = typeof variable;
-		variable = _.variableNotExitType(variable, value);
-		if ( variable === false ) {
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': [name, type]
-			});
-			return false;
-		}
-
-		return value;
-
-	}
 	
 	//Adjust the variables to be able to run the plugin, also puts the settings values in the variables plugin
 	var setPluginVariables = function() {
 
-		//Adjust All
-		self.minDelay 			= checkSameType('minDelay', self.minDelay, settings.minDelay);
-
-		self.itemsPerLoad 		= checkSameType('itemsPerLoad', self.itemsPerLoad, settings.itemsPerLoad);
-		
-		itemsInit 				= checkSameType('itemsInit', itemsInit, settings.itemsInit);
-
-		dataMethod 				= checkSameType('Data - Method', dataMethod, settings.data.method);
-
-		postParameters 			= checkSameType('Data - Post Parameters', postParameters, settings.data.postParameters);
-
-
-		////End Adjust All ----------------------------------
-
-
-		//Adjust Data and GET JSON, 
+		//Adjust Data and GET JSON, if url
 		var typeData = typeof settings.data;
-
 		var regexHTTP = /^(http:\/\/|https:\/\/)/;
-		if ( !_.alternateValueComparate(typeData, ['string', 'object']) ) {
-
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': ['Data - URL', 'string or object']
-			});
-
-		} else if ( (regexHTTP.exec(settings.data.object)) != null ) {
-
-			data = settings.data.object;
-
-		} else if ( (regexHTTP.exec(settings.data.object)) == null && typeData == 'string' ) {
-
-			data = document.location+settings.data.object;
-
-		} else if ( typeData == 'object' ) {
-
-			object = settings.data.object;
-
+		if ( (regexHTTP.exec(settings.data)) != null ) {
+			_.requestAJAX(settings.data, (settings.dataMethod).toLowerCase() );
 		}
-
-
-		//End Adjust Data -----------------------
-		
-		//Adjust baseElement
-		var typeBaseElement = typeof settings.baseElement;
-		//verify if element or string
-		if ( !_.alternateValueComparate(typeBaseElement, ['string', 'object']) || typeBaseElement == 'object' && ( !_.isElement(settings.baseElement) ) ) {
-			
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': ['baseElement', 'string or element']
-			});
-		
-		} else if ( typeBaseElement == 'string' ) {
-			
-			baseElement = document.querySelector(settings.baseElement);
-
-			if ( baseElement == null ) {
-				throwError(3, {
-					'find': ['%s%'],
-					'replace': [settings.baseElement]
-				});
-			}
-
-
-		} else if ( typeBaseElement == 'object' ) {
-			baseElement = settings.baseElement;
-		}
-		
-		//End Adjust baseElement ------------------------
-		
-		
-		//Adjust buttonToLoadMore
-		//Not Required, but if isset buttonLoadMore... verify
-		if( settings.buttonToLoadMore != null ) {
-
-			var typeButtonLoadMore = typeof settings.buttonToLoadMore;
-			//verify if element or string
-			if ( typeButtonLoadMore == 'string' ) {
-				
-				buttonToLoadMore = document.querySelector(settings.buttonToLoadMore);
-
-				if ( buttonToLoadMore == null ) {
-					throwError(3, {
-						'find': ['%s%'],
-						'replace': [settings.buttonToLoadMore]
-					});
-				}
-
-
-			} else if ( typeButtonLoadMore == 'object' ) {
-				if ( !_.isElement(settings.buttonToLoadMore) ) {
-					throwError(2, {
-						'find': ['%p%', '%t%'],
-						'replace': ['buttonToLoadMore', 'string or element']
-					});
-				}
-				buttonToLoadMore = settings.buttonToLoadMore;
-			}
-
-
-		}//end settings.baseElment != null
-		
-
-		//End Adjust buttonToLoadMore ----------------------------------
-
-
-		//Adjust effectOnLoadItems
-		var typeofEffects = typeof settings.effectOnLoadItems;
-
-		if ( !_.alternateValueComparate(typeofEffects, ['string', 'boolean']) ) {
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': ['effectOnLoadItems', 'string or booelan']
-			});
-		} else if ( settings.effectOnLoadItems === true ) {
-			throwError(4);
-		} else if ( typeofEffects == 'string' && availableEffects.indexOf(settings.effectOnLoadItems) == -1 ) {
-			throwError(5);
-		}
-
-		//End Adjust effectOnLoadItems----------------------------------
-		
 
 	}
 
 	//List of Errors
 	var errors = [
-		//Code: 0
-		'Not exists parameters in function loadMore',
-		//Code: 1
-		'The required parameters are '+requireParameters.toString(),
-		//Code: 2	
-		'The parameter %p% must be of type %t%',
-		//Code: 3
-		'Can not find the element with selector equal: %s%',
-		//Code: 4
-		"Select the effect in the parameter effectOnLoadItems, the your value can't be equal true"
-		//Code: 5
-		"Not exists this effect, the available effects are: "+availableEffects.toString()
+		'Not exists parameters in function loadMore', 							//Code: 0
+		'The required parameters are '+requireParameters.toString(), 			//Code: 1	
 	];
 
-	var throwError = function(code, s) {
-		var mensage = ( s != undefined ) ? _.replaceArray(errors[code], s['find'], s['replace']) : errors[code];
-		throw new Error( pluginName + ' - ' + mensage + '.' );
+	var throwError = function(code) {
+		throw new Error( pluginName + ' - ' + errors[code] + '.' );
 	}
-
-
 
 	//End Private Functions -----------------------------------
 	
 	
-
-
 	//Initialization of plugin
 	var init = function(parameters) {
 
@@ -281,26 +116,10 @@ function loadMore(elementGot, parameters)
 
 			//checks were setted the required parameters
 			for( var k in requireParameters ){
-
-				if ( Object.keys(parameters).indexOf(requireParameters[k]) != -1 ){
-					//Require Parameters with object
-					//Data require propertys
-					if( requireParameters[k] == 'data' ){
-
-						//Verify if exists parameters.data.url
-						if ( parameters.data.object != undefined ) {
-							checkedsParameters++;
-						}
-						//else go to next required parameter
-						continue;
-					}
-
+				if ( Object.keys(parameters).indexOf(requireParameters[k]) != -1 )
 					checkedsParameters++;
-				
-				} else {
+				else
 					break;
-				}
-
 			}
 
 			//if not exists the required parameters return error
@@ -311,17 +130,8 @@ function loadMore(elementGot, parameters)
 			for (var key in parameters) {
 
 				if ( settings.hasOwnProperty(key) ) {
-					
-					//if current parameter is object, do other method
-					if( typeof parameters[key] == 'object' && ( !_.isElement(parameters[key]) ) ){
-						
-						for( var k in parameters[key] ) {
-							settings[key][k] = parameters[key][k];
-						}
 
-					} else {
-						settings[key] = parameters[key];
-					}
+					settings[key] = parameters[key];
 
 				}//end if hasOwnProperty
 
@@ -422,36 +232,7 @@ function loadMore(elementGot, parameters)
 
 			ajax[method](url, data, callback, sync);
 
-		},//end RequestAJAX
-
-		alternateValueComparate: function(variable, array) {
-			for ( var k in array ) {
-
-				if( variable == array[k] ){
-					return true;
-				}
-
-			}
-
-			return false;
-
-		},//end alternateValueComparate
-
-		//variable does not change its type
-		variableNotExitType: function(variable, value) {
-			if( typeof variable == typeof value )
-				return value;
-
-			return false;
-		},//end Value not Exit Type
-
-		replaceArray: function(variable, find, replace) {
-			for( var i = 0; i < find.length; i++ ) {
-				variable = variable.replace(find[i], replace[i]);
-			}
-
-			return variable;
-		}
+		}//end RequestAJAX
 
 
 
