@@ -1,4 +1,4 @@
-# Load More 1.3
+# Load More 2.0
 
 O **Load More** é um plugin que permite o desenvolvimento de um sistema em que o número de dados há ser carregados é muito grande, sendo necessário o uso de um botão para **"carregar mais"**. 
 
@@ -10,6 +10,8 @@ Com ele é possível criar estruturas HTML e usar variaveis para serem substitu�
 
 Para usá-lo obrigatoriamente é necessário:
 ### HTML
+
+É necessário uma estratura HTML qualquer, exemplo:
 ```html
 <!--Base Element-->
 <div id="noticias">
@@ -26,7 +28,9 @@ Para usá-lo obrigatoriamente é necessário:
 var news = document.querySelector('#noticias');
 
 var loadMore = news.loadMore({
-			data: 'json/data.json', //local onde está os dados
+            config: {
+                object: 'json/data.json' //local onde estão os dados
+            },
 			baseElement: '#baseElement' //elemento base
 		});
 ```
@@ -70,10 +74,40 @@ As variáveis ``{{@%s%}}`` pode ser usados no meio do **texto HTML** ou em **atr
 As propriedades com * são obrigatórios.
 
 
-##data*
+##config
+
+###object
+```
+config: {
+    object: ''
+}
+```
+
 **URL** onde está o **JSON**, pode ser o caminho direto de um arquivo local ou URL externa. Portanto que retorne um JSON...
 
-**Default:** ``data: ''``
+**Default:** ``object: ''``, é obrigatório
+
+###method
+```
+config: {
+    method: 'GET'
+}
+```
+
+Qual o método vai ser usado para obter o JSON, métodos **GET** ou **POST**.
+
+**Default:** ``method: 'GET'``
+
+###requestData
+```
+config: {
+    requestData: {}
+}
+```
+
+Caso seja necessário o envio de dados (validção ou qualquer outra coisa), colocar em um objeto.
+
+**Default:** ``requestData: '{}'``
 
 
 ##itemsInit
@@ -88,7 +122,7 @@ Depois do primeiro será necessário o chamento da função ``loadMore`` para co
 **Default:** ``itemsPerLoad: 1``
 
 
-##elementForLoad
+##buttonToLoadMore
 Esta propriedade pode ser uma ``string`` ou ``element DOM``, o plugin adicionará um evento de **click** no elemento, para executar a função ``loadMore``.
 
 **Default:** ``elementForLoad: ''``
@@ -105,26 +139,47 @@ Valor númerico em ``ms``, definindo o tempo mínimo entre o chamar da função 
 
 **Default:** ``minDelay: 1000``
 
+##effectOnLoadItems
+Adicionar efeitos quando for mostrar um novo item. Efeitos disponíveis: **fadeIn**, **zoomIn**. Caso sem efeito: **false**.
 
-##autoAddition
-Propriedade tipo boolean, define o auto adicionamento dos itens carregados ao elemento principal.
-
-**Default:** ``autoAddition: true``
+**Default:** ``effectOnLoadItems: false``
 
 
-##onClickForLoad
-Propriedade do tipo ``function``, esta função será chamada se o evento click do **elementForLoad** for chamado.
+##onLoadData
+Propriedade do tipo ``function``, esta função será chamada quando o **object** for carregado. Ela retorna o objeto obitdo.
 
 **Default:** 
 ```js
-function(){ 
+function(object){ 
 	void(0);
 }
 ```
 
 
-##onLoad
-Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for concluída. Está função retorna o(s) elemento(s) carrgado(s) pelo LoadMore
+##beforeLoadMore
+Propriedade do tipo ``function``, esta função será chamada antes de mostrar os novos itens na tela, Ela retorna **loadMoreTimes**, número de vezes chamados a função **loadMore** -1. 
+
+**Default:** 
+```js
+function(loadMoreTimes){ 
+	void(0);
+}
+```
+
+
+##afterLoadMore
+Propriedade do tipo ``function``, esta função será chamada antes de mostrar os novos itens na tela. Ela retorna os novos elementos adicionados em um *array*, e **loadMoreTimes**, número de vezes chamados a função **loadMore**.
+
+**Default:** 
+```js
+function(items, loadMoreTimes){ 
+	void(0);
+}
+```
+
+
+##lastLoadMore
+Propriedade do tipo ``function``, esta função será chamada depois de executar o último **loadMore**. Ela retorna os novos elementos adicionados em um *array*.
 
 **Default:** 
 ```js
@@ -133,9 +188,8 @@ function(items){
 }
 ```
 
-
-##onCompleted
-Propriedade do tipo ``function``, esta função será chamada assim que a função ``loadMore`` for executada pela última vez, ou seja quando não possuir mais elementos à ser mostrados.
+##clickButtonLoadMore
+Propriedade do tipo ``function``, esta função será chamada antes do **loadMore** quando clicado no botão setado em ``buttonToLoadMore``.
 
 **Default:** 
 ```js
@@ -144,6 +198,35 @@ function(){
 }
 ```
 
+##alwaysEndLoadMore
+Propriedade do tipo ``function``, esta função será chamada sempre no final de todos os **loadMore**, ou tentar executar a função **loadMore**.
+
+**Default:** 
+```js
+function(){ 
+	void(0);
+}
+```
+
+#A Classe
+O loadMore retorna um objeto, permitindo a mudança de algumas propriedades ou uso de funçoes mais dinamicamente.
+
+Objeto exemplo:
+```js
+    loadMore: {
+        afterLoadMore: function(items, loadMoreTimes){},
+        alwaysEndLoadMore: function(){},
+        beforeLoadMore: function(items){},
+        clickButtonLoadMore: function(){},
+        destroy: function(){}, //remove todos os itens, zerando o elemento principal
+        effectOnLoadItems: false,
+        itemsPerLoad: 1,
+        lastLoadMore: function(specificKeys, itemsToLoad){}, //executar função loadMore, sem a necessidade de esperar um click do botão setado em buttonToLoadMore
+        loadMoreTimes: 1, //número de vezes em que foi chamado o loadMore
+        minDelay: 0,
+        onLoadData: function(object){}
+    }
+```
 
 Author
 ----

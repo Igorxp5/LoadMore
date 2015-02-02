@@ -53,10 +53,10 @@ function loadMore(elementGot, parameters)
 		beforeLoadMore: function(loadMoreTimes) {
 			void(0);
 		},
-		afterLoadMore: function(loadMoreTimes, items) {
+		afterLoadMore: function(items, loadMoreTimes) {
 			void(0);
 		},
-		lastLoadMore: function(itemsLoaded) {
+		lastLoadMore: function(items) {
 			void(0);
 		},
 		clickButtonLoadMore: function() {
@@ -373,6 +373,7 @@ function loadMore(elementGot, parameters)
 		if ( buttonToLoadMore != null ) {
 
 			buttonLoadMore.addEventListener('click', function(){
+				self.clickButtonLoadMore();
 				self.loadMore({}, self.itemsPerLoad);
 			
 
@@ -693,26 +694,28 @@ function loadMore(elementGot, parameters)
 
 			endEffects();
 
+
+			//After LoadMore
+			//Array with all elments added this loadMore
+			var itemsLoaded = [];
+			for (var i = (mainElement.childNodes).length - 1; i >= (mainElement.childNodes).length - itemsToLoad; i--) {
+				var currentCN = (mainElement.childNodes)[i];
+
+				itemsLoaded.push(currentCN);
+
+			}
+
+			self.loadMoreTimes++;
+			self.afterLoadMore(itemsLoaded, self.loadMoreTimes);
+
 			//if it's last LoadMore, execute the callback lastLoadMore 
 			if( _.objLength(remainderObject) == 0 ) {
-				self.lastLoadMore();
+				self.lastLoadMore(itemsLoaded);
 			}
 
 		}, self.minDelay);
 		
 
-		//After LoadMore
-		//Array with all elments added this loadMore
-		var itemsLoaded = [];
-		for (var i = (mainElement.childNodes).length - 1; i >= (mainElement.childNodes).length - itemsToLoad; i--) {
-			var currentCN = (mainElement.childNodes)[i];
-
-			itemsLoaded.push(currentCN);
-
-		}
-
-		self.loadMoreTimes++;
-		self.afterLoadMore(itemsLoaded, self.loadMoreTimes);
 
 	}
 
@@ -732,11 +735,11 @@ function loadMore(elementGot, parameters)
 		void(0);
 	}
 
-	this.afterLoadMore = function(loadMoreTimes, items) {
+	this.afterLoadMore = function(items, loadMoreTimes) {
 		void(0);
 	}
 
-	this.lastLoadMore = function() {
+	this.lastLoadMore = function(items) {
 		void(0);
 	}
 
