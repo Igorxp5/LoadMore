@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 	<meta charset="UTF-8">
-	<title>Load More 2.0 - Demo 1</title>
+	<title>Load More 2.0 - Demo 3</title>
 	<link rel="stylesheet" href="css/components.css">
 	<link rel="stylesheet" href="css/demo.css">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:700,300,400' rel='stylesheet' type='text/css'>
@@ -14,9 +14,9 @@
 			<h1 class="title-page">Load More</h1>
 			<h2 class="description-title">A plugin to simplify big contents</h2>
 			<ul class="demos">
-				<li class="active"><a href="index.html">Demo 1</a></li>
+				<li><a href="index.html">Demo 1</a></li>
 				<li><a href="demo2.html">Demo 2</a></li>
-				<li><a href="demo3.html">Demo 3</a></li>
+				<li class="active"><a href="demo3.html">Demo 3</a></li>
 				<li><a href="demo4.html">Demo 4</a></li>
 				<li><a href="demo5.html">Demo 5</a></li>
 			</ul>
@@ -24,7 +24,7 @@
 		
 		<section id="content" class="content">
 
-			<div id="demo1" class="demo">
+			<div id="demo3" class="demo">
 					<figure id="baseElement" class="gallery-image">
 						<img src="{{@img}}" title="{{@title}}" alt="{{@title}}">
 						<figcaption>{{@title}}</figcaption>
@@ -37,36 +37,27 @@
 		
 	</div>
 
-	<!-- 
-		
-		ZIP: https://github.com/Igorxp5/LoadMore/zipball/master
-
-		TAR GZ: https://github.com/Igorxp5/LoadMore/tarball/master
-
-		VIEW IN GITHUB: https://github.com/Igorxp5/LoadMore
-
-	 -->
-
-	<script src="js/loadMore.min.js"></script>
+	<script src="js/loadMore.js"></script>
 
 	<script>
 
 	
-		var $demo1 = document.querySelector('#demo1');
+		var $demo3 = document.querySelector('#demo3');
 
-		var $demo1 = $demo1.loadMore({
+		var $content = $demo3.loadMore({
 			config: {
 				object: 'json/data.json',
 			},
-			itemsInit:3,
+			itemsInit:6,
 			itemsPerLoad: 3,
 			baseElement: '#baseElement',
 			effectOnLoadItems:'fadeIn',
+			scrollToLoadMore: true,
 			buttonToLoadMore: '#buttonLoadMore'
 		});
 
 
-		console.log($demo1);
+		console.log($content);
 
 	</script>
 
