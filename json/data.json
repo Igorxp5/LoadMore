@@ -2,47 +2,47 @@
 	
 	{
 		"title"			: "Imagem 1",
-		"img"			: "img/1.png"
+		"img"			: "imgages/1.png"
 	},
 
 	{
 		"title"			: "Imagem 2",
-		"img"			: "img/2.jpg"
+		"img"			: "imgages/2.jpg"
 	},
 
 	{
 		"title"			: "Imagem 3",
-		"img"			: "img/3.jpg"
+		"img"			: "imgages/3.jpg"
 	},
 
 	{
 		"title"			: "Imagem 4",
-		"img"			: "img/4.png"
+		"img"			: "imgages/4.png"
 	},
 
 	{
 		"title"			: "Imagem 5",
-		"img"			: "img/5.jpg"
+		"img"			: "imgages/5.jpg"
 	},
 
 	{
 		"title"			: "Imagem 6",
-		"img"			: "img/7.jpg"
+		"img"			: "imgages/7.jpg"
 	},
 
 	{
 		"title"			: "Imagem 7",
-		"img"			: "img/8.jpg"
+		"img"			: "imgages/8.jpg"
 	},
 
 	{
 		"title"			: "Imagem 8",
-		"img"			: "img/9.png"
+		"img"			: "imgages/9.png"
 	},
 
 	{
 		"title"			: "Imagem 9",
-		"img"			: "img/10.jpg"
+		"img"			: "imgages/10.jpg"
 	}
 
 
