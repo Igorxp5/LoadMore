@@ -38,12 +38,13 @@ function loadMore(elementGot, parameters)
 		config: {
 			object: '',								//Object or URL contain JSON
 			method: 'GET',							//Requisition method to obatin the data
-			requestData: null								//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
-		},				
+			requestData: null						//Form data to send with requisition method POST, only datMethod = POST, example: valid=submit&pass=123
+		},		
 		itemsInit: 1,								//Items to show in firt loadMore
 		itemsPerLoad: 1,							//Items to display per load
 		buttonToLoadMore: null,
 		baseElement: null,
+		scrollToLoadMore: false,
 		minDelay: 0,
 		effectOnLoadItems: false,
 		onLoadData: function(object) {
@@ -86,7 +87,8 @@ function loadMore(elementGot, parameters)
 		itemsInit 			= 1, 							//Items to show in firt loadMore
 		buttonToLoadMore 	= null,							//Element with onclick = loadMore function
 		remainderObject 	= null,							//Remainder Object
-		originalElement 	= null							//Element before the loadMore transformation
+		originalElement 	= null,							//Element before the loadMore transformation
+		lastScroll			= 0;							//Last scroll
 
 
 	//End Private Variables -----------------------------------
@@ -94,8 +96,9 @@ function loadMore(elementGot, parameters)
 
 	//Declarate public variables
 	this.minDelay 				= 0; 							//minimun delay to show elements on screen
-	this.itemsPerLoad 			= 1,							//Items to display per load
+	this.itemsPerLoad 			= 1;							//Items to display per load
 	this.loadMoreTimes 			= 0;							//Number of times it was run loadMore function
+	this.scrollToLoadMore 		= false; 						//Load more when focus the end mainElement
 	this.effectOnLoadItems 		= false; 						//Effect to display when you load new items
 
 
@@ -127,6 +130,8 @@ function loadMore(elementGot, parameters)
 
 		self.itemsPerLoad 		= checkSameType('itemsPerLoad', self.itemsPerLoad, settings.itemsPerLoad);
 		
+		self.scrollToLoadMore 	= checkSameType('scrollToLoadMore', self.scrollToLoadMore, settings.scrollToLoadMore);
+
 		itemsInit 				= checkSameType('itemsInit', itemsInit, settings.itemsInit);
 
 		dataMethod 				= checkSameType('Data - Method', dataMethod, settings.config.method);
@@ -277,6 +282,7 @@ function loadMore(elementGot, parameters)
 		
 		//End Adjust postData----------------------------------
 		
+	
 		//Set Original Element
 		originalElement = mainElement.cloneNode(0);
 
@@ -335,6 +341,30 @@ function loadMore(elementGot, parameters)
 	var throwError = function(code, s) {
 		var mensage = ( s != undefined ) ? _.replaceArray(errors[code], s['find'], s['replace']) : errors[code];
 		throw new Error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
+	}
+
+	//set ScrollToLoadMore
+	var setScrollToLoadMore = function() {
+		window.addEventListener('scroll', function(){
+			if( !self.scrollToLoadMore ) {
+				return false;
+			}
+
+			var scrollTop = window.scrollTop;
+
+			if( scrollTop < lastScroll ) {
+				lastScroll = scrollTop;
+				return false;
+				
+			}
+
+			lastScroll = scrollTop;
+			
+			var postitionEndMainElement = mainElement.offsetTop + mainElement.offsetHeight;
+
+			console.log(postitionEndMainElement);
+
+		});
 	}
 
 	//Set On Click to button selected
@@ -430,6 +460,8 @@ function loadMore(elementGot, parameters)
 			setOnClickButton();
 
 			self.loadMore({}, itemsInit);
+
+			setScrollToLoadMore();
 
 		});
 
