@@ -37,7 +37,6 @@ Element.prototype.loadMore = function(param){
 		buttonToLoadMore: null,
 		baseElement: null,
 		scrollToLoadMore: false,
-		autoScroll: true,
 		minDelay: 0,
 		effectOnLoadItems: false,
 		onLoadData: function(object) {
@@ -80,6 +79,7 @@ var lm = {
 
 	},
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 	var mainElement 					= elementGot,								//Element
 		url 										= null,											//Object or URL contain JSON
@@ -125,13 +125,30 @@ var lm = {
 		  xhr.send();
 
 <<<<<<< HEAD
+=======
+	var mainElement 		= elementGot,					//Element
+		url 				= null,							//Object or URL contain JSON
+		object 				= new Object(),					//Variable to is use in all project
+		dataMethod			= 'GET',						//Requisition method to obatin the data
+		requestData 		= '',							//Form data to send with requisition method POST, only dataMethod = POST
+		baseElement 		= null, 						//Template Element
+		itemsInit 			= 1, 							//Items to show in firt loadMore
+		buttonToLoadMore 	= null,							//Element with onclick = loadMore function
+		remainderObject 	= null,							//Remainder Object
+		originalElement 	= null,							//Element before the loadMore transformation
+		lastScroll			= 0;							//Last scroll
+
+
+	//End Private Variables -----------------------------------
+
+
+>>>>>>> parent of 652acb9... Adicionado o scrollToLoadMore
 	//Declarate public variables
-	this.minDelay 						= 0; 								//minimun delay to show elements on screen
-	this.itemsPerLoad 				= 1;								//Items to display per load
-	this.loadMoreTimes 				= 0;								//Number of times it was run loadMore function
+	this.minDelay 				= 0; 							//minimun delay to show elements on screen
+	this.itemsPerLoad 			= 1;							//Items to display per load
+	this.loadMoreTimes 			= 0;							//Number of times it was run loadMore function
 	this.scrollToLoadMore 		= false; 						//Load more when focus the end mainElement
 	this.effectOnLoadItems 		= false; 						//Effect to display when you load new items
-	this.autoScroll 					= true; 						//Effect to display when you load new items
 
 
 	//End Public Variables -----------------------------------
@@ -301,7 +318,7 @@ var lm = {
 				return false;
 			}
 
-			var scrollTop = document.body.scrollTop;
+			var scrollTop = window.scrollTop;
 
 			if( scrollTop < lastScroll ) {
 				lastScroll = scrollTop;
@@ -311,11 +328,9 @@ var lm = {
 
 			lastScroll = scrollTop;
 			
-			var postitionEndMainElement = _.getPositionTop(mainElement) + mainElement.getBoundingClientRect().top*-1;
+			var postitionEndMainElement = mainElement.offsetTop + mainElement.offsetHeight;
 
-			if( scrollTop >= postitionEndMainElement && occurringLoadMore == false && endLoadMore == false ) {
-				self.loadMore();
-			}
+			console.log(postitionEndMainElement);
 
 		});
 	}
@@ -421,7 +436,6 @@ var lm = {
 <<<<<<< HEAD
 	var endEffects = function() {
 		if( self.effectOnLoadItems == false ) {
-			occurringLoadMore = false;
 			return false;
 		}
 
@@ -451,7 +465,6 @@ var lm = {
 						}
 
 						mainElement.style.transition = '';
-						occurringLoadMore = false;
 
 					}, 500);
 
@@ -469,7 +482,6 @@ var lm = {
 						}
 
 						mainElement.style.transition = '';
-						occurringLoadMore = false;
 
 					}, 500);
 
@@ -506,7 +518,6 @@ var lm = {
 	this.loadMore = function(specificLoad, itemsToLoad) {
 
 		//Before LoadMore
-		occurringLoadMore = true;
 		self.beforeLoadMore(self.loadMoreTimes);
 
 		//get variables after, check arguments
@@ -519,7 +530,6 @@ var lm = {
 		var itemsToLoad = checkedArguments.itemsToLoad;
 
 		if( !checkedArguments ) {
-			occurringLoadMore = false;
 			return false;
 =======
 		if( typeof (lm.c.data) == 'object' ){
@@ -570,7 +580,6 @@ var lm = {
 			//if it's last LoadMore, execute the callback lastLoadMore 
 			if( _.objLength(remainderObject) == 0 ) {
 				self.lastLoadMore(itemsLoaded);
-				endLoadMore = true;
 			}
 =======
 	insertNewValuesOnHTML: function(v, objLength){
@@ -738,15 +747,6 @@ var lm = {
 
 <<<<<<< HEAD
 			return father.childNodes[0];
-		},
-
-		getPositionTop: function(element) {
-			var bodyRect = document.body.getBoundingClientRect(),
-			    elemRect = element.getBoundingClientRect(),
-			    offset   = elemRect.top - bodyRect.top;
-
-			    return offset;
-
 		}
 =======
 	},
