@@ -12,7 +12,7 @@
 	<div class="center-main">
 		<header>
 			<h1 class="title-page">Load More</h1>
-			<h2 class="description-title">A plugin to simplify big contents</h2>
+			<h2 class="description-title">The plugin to simplify your content</h2>
 			<ul class="demos">
 				<li><a href="index.html">Demo 1</a></li>
 				<li><a href="demo2.html">Demo 2</a></li>
@@ -24,42 +24,11 @@
 		
 		<section id="content" class="content">
 
-			<div id="demo3" class="demo">
-					<figure id="baseElement" class="gallery-image">
-						<img src="{{@img}}" title="{{@title}}" alt="{{@title}}">
-						<figcaption>{{@title}}</figcaption>
-					</figure>
-			</div>
-			
-			<button id="buttonLoadMore" class="buttonLoadMore">Load More</button>
+			<center>Em desenvolvimento</center>
 
 		</section>
 		
 	</div>
-
-	<script src="js/loadMore.js"></script>
-
-	<script>
-
-	
-		var $demo3 = document.querySelector('#demo3');
-
-		var $content = $demo3.loadMore({
-			config: {
-				object: 'json/data.json',
-			},
-			itemsInit:6,
-			itemsPerLoad: 3,
-			baseElement: '#baseElement',
-			effectOnLoadItems:'fadeIn',
-			scrollToLoadMore: true,
-			buttonToLoadMore: '#buttonLoadMore'
-		});
-
-
-		console.log($content);
-
-	</script>
 
 </body>
 </html>
