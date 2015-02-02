@@ -7,22 +7,7 @@
 </head>
 <body>
 	
-<<<<<<< HEAD
-	<div class="center-main">
-		<header>
-			<h1 class="title-page">Load More</h1>
-			<h2 class="description-title">A plugin to simplify big contents</h2>
-			<ul class="demos">
-				<li class="active"><a href="index.html">Demo 1</a></li>
-				<li><a href="demo2.html">Demo 2</a></li>
-				<li><a href="demo3.html">Demo 3</a></li>
-				<li><a href="demo4.html">Demo 4</a></li>
-				<li><a href="demo5.html">Demo 5</a></li>
-			</ul>
-		</header>
-=======
 	<h1>Load More</h1>
->>>>>>> parent of c8b4386... 2.0
 		
 	<section>
 		<h2>Notícias</h2>
@@ -40,7 +25,7 @@
 	
 	</section>
 
-	<script src="js/loadMore.js"></script>
+	<script src="js/loadMore-2.0.js"></script>
 
 	<script>
 
@@ -96,29 +81,20 @@
 
 		var news = document.querySelector('#noticias');
 
-
-		var loadMore = news.loadMore({
-			data: 'json/data.json', //array com itens, os itens devem serum objeto | O campo também pode ser uma url caso uma url o plugin carregara-lo antes *
-			itemsInit: 1, //nº itens iniciais
-			itemsPerLoad: 3, //nº itens a serem adicionados sempre quando for carregar mais itens
-			elementForLoad: '#buttonLoadMore',//elemento para que quando for clicado carregar mais itens 
-			baseElement: '#baseElement', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
-			minDelay: 0, //delay minimo para carregar o conteudo em milisegundos
-			onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
-				void(0);
+		var $loadMore = news.loadMore({
+			config: {
+				object: 'json/data.json',
 			},
-			onLoad: function(){ //terminar de carregar loadMore (mostrar novos items)
-				void(0);
-			},
-			onCompleted: function(){ //função à ser executada quando todos os itens já foram adicionados
-				void(0);
-			}
+			baseElement: '#baseElement',
+			buttonToLoadMore: '#buttonLoadMore'
 		});
 		
 		// setTimeout(function(){
 		// 	//é possivel chamar a função loadMore em qualquer parte do seu código
 		// 	loadMore.loadMore({title: 'Noticia 3'});
 		// }, 3000);
+
+		console.log($loadMore);
 
 	</script>
 

@@ -1,34 +1,26 @@
 /*
- * Load More - Javascript Plugin
- * Plugin for load more something in elements
+ * Load More - Plugin for load more after
  *
- * 
- * Author: Igor Fernandes
- * Version:  2.0-dev
- * License: LCS
+ * LCS
  *
- * Copyright 2015
- * 
+ * Version:  1.3-dev
+ *
  */
 
+
 /*jslint browser:true */
+'use strict';
 
-function loadMore(elementGot, parameters) 
-{
-	"use strict";
-
-	//Set Self
-	var self = this;
-
-
-	//Setting definitions of plugin
-	var pluginDefinitions = {
-		name: 'Load More',
-		pluginVersion: '2.1',
-		//String to be replaced for key in foreach
-		replacerKeys:'{{@%s%}}'
+Element.prototype.loadMore = function(param){
+	if(typeof param == 'object'){
+		lm.init(this, param);
+		return new classLm();
 	}
+	else
+		lm.clError('The parameters must be object.');
+}
 
+<<<<<<< HEAD
 	var requireParameters = [
 		'config',
 		'baseElement'
@@ -49,11 +41,27 @@ function loadMore(elementGot, parameters)
 		minDelay: 0,
 		effectOnLoadItems: false,
 		onLoadData: function(object) {
+=======
+var lm = {
+	//configurações do usario
+	c: {
+
+		//itens com *, são obrigatorios
+		data: '', //onde vai ser obtido o array com os itens, pode ser um objeto ou url, caso uma url o plugin carregara-lo antes *
+		itemsInit: 1, //nº itens iniciais
+		itemsPerLoad: 1, //nº itens a serem adicionados sempre quando for carregar mais itens
+		elementForLoad: '',//elemento para que quando for clicado carregar mais itens 
+		baseElement: '', //elemento que será tomado como base para adicionar os novos itens do loadMore, "ele será apagado" *
+		autoAddition: true,//default true, define se o plugin adicionará automaticamente os novos itens
+		minDelay: 1000, //delay minimo para carregar o conteudo em milisegundos
+		onClickForLoad: function(){ //função à ser executada com for clicado no botao: elementForLoad
+>>>>>>> parent of c8b4386... 2.0
 			void(0);
 		},
-		beforeLoadMore: function(loadMoreTimes) {
+		onLoad: function(items){ //terminar de carregar loadMore (mostrar novos itens)
 			void(0);
 		},
+<<<<<<< HEAD
 		afterLoadMore: function(items, loadMoreTimes) {
 			void(0);
 		},
@@ -64,21 +72,15 @@ function loadMore(elementGot, parameters)
 			void(0);
 		},
 		alwaysEndLoadMore: function() {
+=======
+		onCompleted: function(){ //função à ser executada quando todos os itens já foram adicionados
+>>>>>>> parent of c8b4386... 2.0
 			void(0);
 		}
-	}
 
+	},
 
-
-	//Declarate private variables
-	//
-	//Effects available to use
-	var availableEffects = [
-		'fadeIn',
-		'zoomIn'
-	];
-
-
+<<<<<<< HEAD
 	var mainElement 					= elementGot,								//Element
 		url 										= null,											//Object or URL contain JSON
 		object 									= new Object(),							//Variable to is use in all project
@@ -92,11 +94,37 @@ function loadMore(elementGot, parameters)
 		lastScroll							= 0,												//Last scroll
 		occurringLoadMore				= false,										//Determines whether the load more is running
 		endLoadMore							= false;										//Determine whether load all object's items
+=======
+	//configurações internas
+	i: {
+		data: '',
+		attributeForKeys: 'data-loadmore',
+		replacer: '{{@%s%}}',
+>>>>>>> parent of c8b4386... 2.0
 
+		getJSON: function(url, successHandler, errorHandler) {
 
-	//End Private Variables -----------------------------------
+		  var xhr = typeof XMLHttpRequest != 'undefined'
+		    ? new XMLHttpRequest()
+		    : new ActiveXObject('Microsoft.XMLHTTP');
+		  xhr.open('get', url, true);
+		  xhr.onreadystatechange = function() {
+		    var status;
+		    var data;
+		    if (xhr.readyState == 4) { // `DONE`
+		      status = xhr.status;
+		      if (status == 200) {
+		        data = JSON.parse(xhr.responseText);
+		        successHandler && successHandler(data);
+		      } else {
+		        errorHandler && errorHandler(status);
+		      }
+		    }
+		  }
 
+		  xhr.send();
 
+<<<<<<< HEAD
 	//Declarate public variables
 	this.minDelay 						= 0; 								//minimun delay to show elements on screen
 	this.itemsPerLoad 				= 1;								//Items to display per load
@@ -166,122 +194,60 @@ function loadMore(elementGot, parameters)
 			object = settings.config.object;
 
 		}
+=======
+		},//end getJSON
 
 
-		//End Adjust Data -----------------------
-		
-		//Adjust baseElement
-		var typeBaseElement = typeof settings.baseElement;
+	},//end i
+>>>>>>> parent of c8b4386... 2.0
 
-		var baseElementSelector;
+	//funções simplificadas
+	sF: {
+		//serach in a object
+		search: function(a, search){
 
-		//verify if element or string
-		if ( !_.alternateValueComparate(typeBaseElement, ['string', 'object']) || typeBaseElement == 'object' && ( !_.isElement(settings.baseElement) ) ) {
+			if( !(Object.keys(search).length > 0) )
+				return a;
+
+			var r = [];
+
+			for( var i in a ){
 			
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': ['baseElement', 'string or element']
-			});
-		
-		} else if ( typeBaseElement == 'string' ) {
-			
-			baseElementSelector = document.querySelector(settings.baseElement);
+				var current = a[i];
 
-			if ( baseElementSelector == null ) {
-				throwError(3, {
-					'find': ['%s%'],
-					'replace': [settings.baseElement]
-				});
-			}
+				var n = 0;
 
+				for( var k in search ){
 
-		} else if ( typeBaseElement == 'object' ) {
-			baseElementSelector = (settings.baseElement);
-		}
+					if( current[k] != search[k] )
+						break;
 
-		//remove baseElement, clone it and remove attribute id
-		baseElement = baseElementSelector.cloneNode(true);
-		baseElement.removeAttribute('id');
-		baseElementSelector.remove();
-		
-		//End Adjust baseElement ------------------------
-		
-		
-		//Adjust buttonToLoadMore
-		//Not Required, but if isset buttonLoadMore... verify
-		if( settings.buttonToLoadMore != null && settings.buttonToLoadMore != undefined ) {
+					n++;
 
-			var typeButtonLoadMore = typeof settings.buttonToLoadMore;
-			//verify if element or string
-			if ( typeButtonLoadMore == 'string' ) {
-				
-				buttonToLoadMore = document.querySelector(settings.buttonToLoadMore);
-
-				if ( buttonToLoadMore == null ) {
-					throwError(3, {
-						'find': ['%s%'],
-						'replace': [settings.buttonToLoadMore]
-					});
+					if( n == (Object.keys(search).length) )
+						r.push(current);
+						
 				}
 
-
-			} else if ( typeButtonLoadMore == 'object' ) {
-				if ( !_.isElement(settings.buttonToLoadMore) ) {
-					throwError(2, {
-						'find': ['%p%', '%t%'],
-						'replace': ['buttonToLoadMore', 'string or element']
-					});
-				}
-				buttonToLoadMore = settings.buttonToLoadMore;
 			}
 
+			if(r.length == 0)
+				return -1;
+			else
+				return r;
+		},//end search
 
-		}else {
+		severalSplice: function(a, search){
+			var array = a;
 
-			buttonToLoadMore = null;
-
-		} //end settings.buttonToLoadMore != null
-
-
-		
-
-		//End Adjust buttonToLoadMore ----------------------------------
-
-
-		//Adjust effectOnLoadItems
-		var typeofEffects = typeof settings.effectOnLoadItems;
-
-		if ( !_.alternateValueComparate(typeofEffects, ['string', 'boolean']) ) {
-			throwError(2, {
-				'find': ['%p%', '%t%'],
-				'replace': ['effectOnLoadItems', 'string or booelan']
-			});
-		} else if ( settings.effectOnLoadItems === true ) {
-			throwError(4);
-		} else if ( typeofEffects == 'string' && availableEffects.indexOf(settings.effectOnLoadItems) == -1 ) {
-			throwError(5);
-		} else if ( availableEffects.indexOf(settings.effectOnLoadItems) != -1 ) {
-			self.effectOnLoadItems = settings.effectOnLoadItems;
-		}
-
-		//End Adjust effectOnLoadItems----------------------------------
-		
-		//Adjust postData
-		var typeRequestData = typeof settings.config.requestData;
-
-		if( requestData != null ) {
-
-			if ( typeRequestData != 'object' ) {
-				throwError(2, {
-					'find': ['%p%', '%t%'],
-					'replace': ['postData', 'object']
-				});
-			} else {
-
-				requestData =  settings.config.requestData;
+			for( var k in search ){
+				var index = array.indexOf(search[k]);
+				if( index != -1 )
+					array.splice(index, 1);
 
 			}
 
+<<<<<<< HEAD
 		}
 		
 		//End Adjust postData----------------------------------
@@ -319,34 +285,15 @@ function loadMore(elementGot, parameters)
 				callback(r);
 			});
 		}
+=======
+			return array;
+>>>>>>> parent of c8b4386... 2.0
 
-	}
+		}//end severalSplice
 
-	//End getObject Data
+	},//end sF
 
-	//List of Errors
-	var errors = [
-		//Code: 0
-		"Not exists parameters in function loadMore",
-		//Code: 1
-		"The required parameters are "+requireParameters.join(', '),
-		//Code: 2	
-		"The parameter %p% must be of type %t%",
-		//Code: 3
-		"Can not find the element with selector equal: %s%",
-		//Code: 4
-		"Select the effect in the parameter effectOnLoadItems, the your value can't be equal true",
-		//Code: 5
-		"Not exists this effect, the available effects are: "+availableEffects.join(', '),
-		//Code: 6
-		"In function %f% - The %a% must be of type %t%"
-	];
-
-	var throwError = function(code, s) {
-		var mensage = ( s != undefined ) ? _.replaceArray(errors[code], s['find'], s['replace']) : errors[code];
-		throw new Error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
-	}
-
+<<<<<<< HEAD
 	//set ScrollToLoadMore
 	var setScrollToLoadMore = function() {
 		window.addEventListener('scroll', function(){
@@ -375,93 +322,30 @@ function loadMore(elementGot, parameters)
 
 	//Set On Click to button selected
 	var setOnClickButton = function() {
+=======
+	init: function(el, params){
+>>>>>>> parent of c8b4386... 2.0
 
-		if ( buttonToLoadMore != null ) {
+		lm.c.el = el;
 
+<<<<<<< HEAD
 			buttonLoadMore.addEventListener('click', function(){
 				self.clickButtonLoadMore();
 				self.loadMore({}, self.itemsPerLoad);
+=======
+		if(params) {
+>>>>>>> parent of c8b4386... 2.0
 			
 
-			});
+			for(var key in params) {
+				if(lm.c.hasOwnProperty(key)) {
 
-		}
+					lm.c[key] = params[key];
 
-	} //end SetOnClckButton
-
-
-
-	//Initialization of plugin
-	var init = function(parameters) {
-
-		if (parameters) {
-
-			var checkedsParameters = 0;
-
-			//checks were setted the required parameters
-			for( var k in requireParameters ){
-
-				if ( Object.keys(parameters).indexOf(requireParameters[k]) != -1 ){
-					//Require Parameters with object
-					//Data require propertys
-					if( requireParameters[k] == 'config' ){
-
-						//Verify if exists parameters.data.url
-						if ( parameters.config.object != undefined ) {
-							checkedsParameters++;
-						}
-						//else go to next required parameter
-						continue;
-					}
-
-					checkedsParameters++;
-				
-				} else {
-					break;
-				}
-
-			}
-
-			//if not exists the required parameters return error
-			if( checkedsParameters != requireParameters.length ){
-				throwError(1);
-			}
-
-			//checks were setted the required parameters
-			for (var key in parameters) {
-
-				if ( settings.hasOwnProperty(key) ) {
-					
-					//if current parameter is object, do other method
-					if( typeof parameters[key] == 'object' && ( !_.isElement(parameters[key]) ) ){
-						
-						for( var k in parameters[key] ) {
-							settings[key][k] = parameters[key][k];
-						}
-
-					} else {
-						settings[key] = parameters[key];
-					}
-
-				}//end if hasOwnProperty
-
-			}//end for key in parameters
-
-		}//end if parameters
-		else {
-			//If not exists parameters show error
-			throwError(0);
-		}
-
-		setPluginVariables(); //Adjust the variables and put in global variables
-		getObjectData(function(r){
-			
-			if( r ) {
-				if ( typeof r != 'oject' ) {
-					object = JSON.parse(r);
 				}
 			}
 
+<<<<<<< HEAD
 			self.onLoadData(object);
 
 			setOnClickButton();
@@ -475,85 +359,66 @@ function loadMore(elementGot, parameters)
 
 	}//end init
 
+=======
+		}//end for
+>>>>>>> parent of c8b4386... 2.0
 
-	var verifyBeforeLoadMore = function(specificLoad, itemsToLoad) {
-		//Initial Definitions
-		var objectInitial = (remainderObject == null) ? object : remainderObject;
+		lm.adjustmentsInVar();
+		lm.createBaseElement();
 
-		//if not defined the specificLoad, create a empty object
-		specificLoad = ( specificLoad == undefined ) ? new Object() : specificLoad;
+		if( lm.c.data == 'object' ){
+			lm.i.data = lm.c.data;
+			lm.initConfigs();
+		}
+		else
+			lm.getArray();
 
-		//if not defined the specificLoad, use the variable itemsPerLoad
-		itemsToLoad = ( itemsToLoad == undefined ) ? self.itemsPerLoad : itemsToLoad
 
-		//Verification of arguments
+	},//end init
 
-		if ( objectInitial.length == 0 ) {
-			self.alwaysEndLoadMore();
-			return false;
+	//faz alterações na variaveis e set erros
+	adjustmentsInVar: function(){
+		//ajuste no elementForLoad
+		if( typeof (lm.c.elementForLoad) == 'string' && (lm.c.elementForLoad) != ''){
+			(lm.c.elementForLoad) = document.querySelector(lm.c.elementForLoad);
+			if(!lm.c.elementForLoad)
+				lm.clError("The element setted to 'elementForLoad' doesn't exist.");
 		}
 
-		if ( typeof specificLoad != 'object' ) {
-			throwError(6, {
-				'find': ['%f%', '%a%', '%t%'],
-				'replace': ['loadMore', 'first argument (specificLoad)', 'object']
-			});
+		//ajuste minDelay
+		if( typeof (lm.c.minDelay) != 'number' )
+			lm.clError('The minDelay property must be of number type.');
+
+
+		//ajuste em baseElement
+		if( typeof (lm.c.baseElement) != 'string' && typeof (lm.c.baseElement) != 'object' )
+			if(!lm.c.baseElement)
+				lm.clError("The element to 'baseElement' wasn't setted.");
+
+		if( typeof (lm.c.baseElement) == 'string'){
+			(lm.c.baseElement) = document.querySelector(lm.c.baseElement);
+			if(!lm.c.baseElement)
+				lm.clError("The element setted to 'baseElement' doesn't exist.");
 		}
 
-		if ( typeof itemsToLoad != 'number' ) {
-			throwError(6, {
-				'find': ['%f%', '%a%', '%t%'],
-				'replace': ['loadMore', 'second argument (itemsToLoad)', 'number']
-			});
-		}
+		//itemsInit e itemsPerLoad
+		if( typeof (lm.c.itemsInit) != 'number' )
+			lm.clError('The itemsInit property must be of number type.');
 
-		return {
-			'objectInitial': objectInitial,
-			'specificLoad': specificLoad,
-			'itemsToLoad': itemsToLoad
-		}
+		if( typeof (lm.c.itemsPerLoad) != 'number' )
+			lm.clError('The itemsPerLoad property must be of number type.');
 
+		//ajuste no data
+		if( typeof (lm.c.data) != 'string' && typeof (lm.c.data) != 'object' )
+			lm.clError('The data property must be of number type or string type(url).');
 
-	} //End verifyBeforeLoadMore
+		if( typeof (lm.c.data) == 'string' ){
 
+			if( (lm.c.data).search('http') == -1 ){
+				var url = document.location;
+				(lm.c.data) = url+'/'+(lm.c.data);
 
-	var insertNewElementsInMainElement = function(html) {
-		//insert new elements in main element
-		mainElement.innerHTML += html;
-	}
-
-	//Effects Module
-	var startEffects = function(items) {
-		if ( self.effectOnLoadItems == false ) {
-			return items;
-		}
-
-		//Adding predefinitions in Main Element
-		mainElement.style.transition = 'height .5s';
-
-		//Adding predefinitions
-		for ( var i = 0; i < items.childNodes.length; i++ ) {
-		if ( items.childNodes[i] == undefined || items.childNodes[i].style == undefined ) {
-					continue;
-			}
-			items.childNodes[i].style.opacity = '0';
-			items.childNodes[i].style.height = '0';
-			items.childNodes[i].style.width = '0';
-			items.childNodes[i].style.margin = '0';
-			items.childNodes[i].style.padding = '0';
-			items.childNodes[i].style.transition = 'height .5s, width .5s, opacity .7s, margin .5s, padding .5s';
-
-			if ( self.effectOnLoadItems == 'zoomIn' ) {
-				items.childNodes[i].style.transition = 'height .5s, width .5s, opacity .7s, margin .5s, padding .5s, transform .5s';
-				items.childNodes[i].style.transform = 'scale3d(.3, .3, .3)';
-			}
-		}
-
-		return items;
-
-
-	} //End startEffects
-
+<<<<<<< HEAD
 	var endEffects = function() {
 		if( self.effectOnLoadItems == false ) {
 			occurringLoadMore = false;
@@ -610,10 +475,22 @@ function loadMore(elementGot, parameters)
 
 
 				} 	//End zoomIn
+=======
+			}
+			
+		}
 
-			}, 500);
+	}, //end adjustmentsInVar
+>>>>>>> parent of c8b4386... 2.0
 
+	initConfigs:  function(){
+		lm.loadMore({}, lm.c.itemsInit);
+		lm.insertOns();
+	},
 
+	getArray: function(){
+
+<<<<<<< HEAD
 
 	} //End endEffects
 
@@ -644,67 +521,38 @@ function loadMore(elementGot, parameters)
 		if( !checkedArguments ) {
 			occurringLoadMore = false;
 			return false;
+=======
+		if( typeof (lm.c.data) == 'object' ){
+			lm.i.data = lm.c.data;
+			lm.initConfigs();
+			return true;
+>>>>>>> parent of c8b4386... 2.0
 		}
 
-		//Run LoadMore
+		lm.i.getJSON(lm.c.data, function(data){
+			lm.i.data = data;
+			lm.initConfigs();
+		}, function(status){
+			lm.clError("Couldn't get the data of the file: "+lm.c.data);
+		});
 		
-		var objectToFor =  new Object();
+	}, //end getArray
 
-		//if exists specificLoad and it's greater than zero
-		if ( _.objLength(specificLoad) > 0 ) {
-			var search = _.search(objInitial, specificLoad);
-			objectToFor = ( search != -1 ) ? search : objectInitial;
-		}
 
-		objectToFor = objectInitial;
+	createBaseElement: function(){
+		//clona o elemento base
+		(lm.i.baseElement) = (lm.c.baseElement).cloneNode(true);
 
-		var objectsLoaded = [];
+		//removendo id
+		(lm.i.baseElement).removeAttribute('id');
 
-		var items = document.createElement('div');
+		//apagar o elemento base
+		(lm.c.baseElement).remove();
 
-		//for on number of items to load
-		for ( var i = 0; i < itemsToLoad; i++ ) {
 
-			var current = objectToFor[i];
+	}, //end createBaseElement
 
-			objectsLoaded.push(current);
-
-			var item = baseElement.cloneNode(true);
-
-			var itemHTML = _.getCompleteHTML(item);
-
-			var splitReplacer = (pluginDefinitions.replacerKeys).split('%s%');
-
-			//for in keys of each object
-			for ( var k in current ) {
-
-				//replacemen default replace for key replace
-				var replacer = splitReplacer[0]+k+splitReplacer[1];
-
-				//HTML Replace
-				itemHTML = itemHTML.replace(new RegExp(replacer, 'g'), current[k]);
-
-			}
-
-			//Return the new HTML ELement
-			item = _.createElementFromHTML(itemHTML);
-
-			//Add in temporary element
-			items.appendChild(item);
-
-		}//emd for the itemsToLoad
-
-		items = startEffects(items);
-		
-		//recreates the remainderObject
-		remainderObject = _.severalSplice(objectInitial, objectsLoaded);
-
-		//Add new Elements in Main Element, waiting for minDelay Time
-		setTimeout(function(){
-			insertNewElementsInMainElement(items.innerHTML);
-
-			endEffects();
-
+<<<<<<< HEAD
 
 			//After LoadMore
 			//Array with all elments added this loadMore
@@ -724,10 +572,18 @@ function loadMore(elementGot, parameters)
 				self.lastLoadMore(itemsLoaded);
 				endLoadMore = true;
 			}
+=======
+	insertNewValuesOnHTML: function(v, objLength){
+		//inserir no elemento pricipal todos os novos elementos
+		(lm.c.el).innerHTML += v;
+>>>>>>> parent of c8b4386... 2.0
 
-		}, self.minDelay);
-		
+		//se está mostrando todos items
+		if( this.i.remainderData.length == 0 )
+			lm.c.onCompleted();
+	},
 
+<<<<<<< HEAD
 
 	}
 
@@ -764,204 +620,123 @@ function loadMore(elementGot, parameters)
 	}
 
 
+=======
+	insertOns: function(){
 
-
-
-	//End Callbacks functions -----------------------------------
-
-	//External Functions
-	var _ = {
-
-		isElement: function(object) {
-			return !!(object && object.nodeType == 1);
-		},//end isElement
-
-		requestAJAX: function(url, method, data, callback) {
-
-			var ajax = {};
-
-			ajax.x = function() {
-			    if (typeof XMLHttpRequest !== 'undefined') {
-			        return new XMLHttpRequest();  
-			    }
-			    var versions = [
-			        "MSXML2.XmlHttp.5.0",   
-			        "MSXML2.XmlHttp.4.0",  
-			        "MSXML2.XmlHttp.3.0",   
-			        "MSXML2.XmlHttp.2.0",  
-			        "Microsoft.XmlHttp"
-			    ];
-
-			    var xhr;
-			    for(var i = 0; i < versions.length; i++) {  
-			        try {  
-			            xhr = new ActiveXObject(versions[i]);  
-			            break;  
-			        } catch (e) {
-			        }  
-			    }
-			    return xhr;
-			}
-
-			ajax.send = function(url, callback, method, data) {
-			    var x = ajax.x();
-			    x.open(method, url);
-			    x.onreadystatechange = function() {
-			        if (x.readyState == 4) {
-			            callback(x.responseText)
-			        }
-			    };
-			    if (method == 'POST') {
-			        x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-			    }
-			    x.send(data)
-			}
-
-			ajax.get = function(url, data, callback) {
-			    var query = [];
-			    for (var key in data) {
-			        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-			    }
-			    ajax.send(url + '?' + query.join('&'), callback, 'GET', null)
-			}
-
-			ajax.post = function(url, data, callback) {
-			    var query = [];
-
-			    for (var key in data) {
-			        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-			    }
-			    ajax.send(url, callback, 'POST', query.join('&'));
-			}
-
-			ajax[method](url, data, callback);
-
-		},//end RequestAJAX
-
-		alternateValueComparate: function(variable, array) {
-			for ( var k in array ) {
-
-				if( variable == array[k] ){
-					return true;
-				}
-
-			}
-
+		if(!lm.c.elementForLoad || lm.c.elementForLoad == '')
 			return false;
 
-		},//end alternateValueComparate
+		(lm.c.elementForLoad).onclick = function(){
+			lm.loadMore();
+			lm.c.onClickForLoad();
+		}
 
-		//variable does not change its type
-		variableNotExitType: function(variable, value) {
-			if( typeof variable == typeof value )
-				return value;
+	},
+>>>>>>> parent of c8b4386... 2.0
 
+	loadMore: function(search, itemsToLoad, minDelay){
+
+		var objInitial = (this.i.remainderData == undefined) ? this.i.data : this.i.remainderData;
+
+		//html do elemento que vai ser inserido no final do for
+		var items = document.createElement('div');
+
+		//usando valores setados nas configurações do plugin
+		if( objInitial == undefined || typeof objInitial != 'object'){
 			return false;
-		},//end Value not Exit Type
+		}
+		if( objInitial.length == 0 )
+			return false;
 
-		replaceArray: function(variable, find, replace) {
-			for( var i = 0; i < find.length; i++ ) {
-				variable = variable.replace(new RegExp(find[i], 'g'), replace[i]);
-			}
+		if( !(search != undefined && typeof search == 'object') )
+			search = {};
 
-			return variable;
-		}, //end replaceArray
+		if( !(itemsToLoad != undefined && typeof itemsToLoad == 'number') )
+			itemsToLoad = lm.c.itemsPerLoad;
 
-		objLength: function(variable) {
-			if( typeof variable != 'object' || variable == null )
-				return false;
+		if( !(minDelay != undefined && typeof minDelay == 'number') )
+			minDelay = lm.c.minDelay;
 
-			return Object.keys(variable).length;
-		}, //end objLength
+		var obj;
+		//se existir o search, vai ser feito uma procura para só colocar objetos com determinados value em suas keys
+		if( Object.keys(search).length > 0 ){
+			var newObj = lm.sF.search(objInitial, search);
+			obj = (newObj != -1) ? newObj : objInitial;
+		}else
+			obj = objInitial;
 
-		urlObject: function(url) {
-			var a = document.createElement('a');
+		var objUsed = [];
 
-			a.setAttribute('href', url);
+		//i para index e m para numero de elementos por loadmore
+		for( var i = 0; i < itemsToLoad; i++ ){
 
-			var urlObj = {
-		        protocol: a.protocol,
-		        hostname: a.hostname,
-		        host: a.host,
-		        port: a.port,
-		        hash: a.hash.substr(1),
-		        pathname: a.pathname,
-		        search: a.search
-		    };
+			var current = obj[i];
 
-		    return urlObj;
+			//adicionando em objUsed
+			objUsed.push(current);
 
-		}, //end urlObject
+			//split do replacer
+			var spReplacer = (this.i.replacer).split('%s%');
 
-		//serach in a object
-		search: function(a, search){
+			var item = (lm.i.baseElement).cloneNode(true);
 
-			if( !(Object.keys(search).length > 0) )
-				return a;
+			//elemento principal html
+			var itemHTML = item.innerHTML;
 
-			var r = [];
+			//attributes do elemento principal
+			var attributes = item.attributes;
 
-			for( var i in a ){
-			
-				var current = a[i];
+			//for das keys dentro de cada value do array
+			for( var k in current ){
+				
+				//replacer usando o nome do objeto
+				var replacer = spReplacer[0]+k+spReplacer[1];
 
-				var n = 0;
+				itemHTML = itemHTML.replace(new RegExp(replacer, 'g'), current[k]);
 
-				for( var k in search ){
+				//for dos attributes
+					
+					for( var a = 0; a < attributes.length; a++){
 
-					if( current[k] != search[k] )
-						break;
+						var attribute = attributes[a].nodeName;
+						var value = attributes[a].value;
 
-					n++;
+						if( value.search(replacer) != -1 ){
+							item.setAttribute(attribute, current[k]);
+						}
 
-					if( n == (Object.keys(search).length) )
-						r.push(current);
-						
-				}
+					}
+					
+			}//end for das keys
 
-			}
+			//alterando o html do item
+			item.innerHTML = itemHTML;
 
-			if(r.length == 0)
-				return -1;
-			else
-				return r;
-		},//end search
+			items.appendChild(item);
 
-		//remove item in a array with search object
-		severalSplice: function(a, search){
+		}//for dos itemsInit
 
-			if( _.objLength(a) == 0 ) {
-				return array;
-			}
+		this.i.remainderData = lm.sF.severalSplice(objInitial, objUsed);
 
-			var array = a;
+		//delay min para inserir
+		setTimeout(function(){
+			if( lm.c.autoAddition == true )
+				lm.insertNewValuesOnHTML(items.innerHTML, obj.length);
 
-			for( var k in search ){
-				var index = array.indexOf(search[k]);
-				if( index != -1 )
-					array.splice(index, 1);
+			//Retorna o(s) elemento(s) obitidos pelo loadMore
+			var itemsOnLoad = [];
+			for (var i = ((lm.c.el).childNodes).length - 1; i >= ((lm.c.el).childNodes).length - itemsToLoad; i--) {
+				var currentCN = ((lm.c.el).childNodes)[i];
 
-			}
+				itemsOnLoad.push(currentCN);
 
-			return array;
+			};
+			var returnOnLoad = itemsOnLoad;
 
-		},//end severalSplice
+			lm.c.onLoad(returnOnLoad);
+		}, minDelay);
 
-		getCompleteHTML: function(element) {
-
-			var clone = element.cloneNode(true);
-
-			var father = document.createElement('div');
-
-			father.appendChild(clone);
-
-			return father.innerHTML;
-		},
-
-		createElementFromHTML: function(html) {
-			var father = document.createElement('div');
-			father.innerHTML = html;
-
+<<<<<<< HEAD
 			return father.childNodes[0];
 		},
 
@@ -973,19 +748,33 @@ function loadMore(elementGot, parameters)
 			    return offset;
 
 		}
+=======
+	},
+>>>>>>> parent of c8b4386... 2.0
 
+	clError: function(msg){
+		throw new Error('loadMore - '+msg);
+	}
 
-	} //end _ function
+}//end lm
 
-	//End External Funcion -----------------------------------
-
-
-	//Initializate plugin
-	init(parameters);
-
+//criando classe Lm, para ser possível usar a função loadMore, fora do botão
+function classLm(){
+	this.i = lm.i;
 }
 
-//Set Function loadMore with Element prototype
-Element.prototype.loadMore = function(parameters) {
-	return new loadMore(this, parameters);
+classLm.prototype.loadMore = function(search, itemsToLoad, minDelay){
+
+	if( typeof this.i.data != 'object' ){
+		
+		this.i.getJSON(this.i.data, function(data){
+			this.i.data = data;
+			lm.loadMore(search, itemsToLoad, minDelay);
+		},function(){
+			console.error("loadMore - Couldn't get the data of the file: "+this.i.data);
+		});
+
+	}else
+		lm.loadMore(search, itemsToLoad, minDelay);
+
 }
