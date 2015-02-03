@@ -39,7 +39,7 @@
 
 	
 
-	<script src="js/loadMore.min.js"></script>
+	<script src="js/loadMore.js"></script>
 
 	<script>
 
@@ -53,11 +53,13 @@
 			itemsInit:3,
 			itemsPerLoad: 3,
 			baseElement: '#baseElement',
+			autoScroll: true,
 			effectOnLoadItems:'fadeIn',
 			buttonToLoadMore: '#buttonLoadMore'
 		});
 
-
+		$demo1.removeEvents('buttonToLoadMore');
+		
 		console.log($demo1);
 
 	</script>

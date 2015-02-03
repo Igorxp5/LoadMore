@@ -45,7 +45,7 @@ function loadMore(elementGot, parameters)
 		buttonToLoadMore: null,
 		baseElement: null,
 		scrollToLoadMore: false,
-		autoScroll: true,
+		autoScroll: false,
 		minDelay: 0,
 		effectOnLoadItems: false,
 		onLoadData: function(object) {
@@ -78,32 +78,39 @@ function loadMore(elementGot, parameters)
 		'zoomIn'
 	];
 
+	//Events available to remove
+	var availableRemoveEvents = [
+		'buttonToLoadMore',
+		'scrollToLoadMore'
+	]; 
 
-	var mainElement 					= elementGot,								//Element
-		url 										= null,											//Object or URL contain JSON
-		object 									= new Object(),							//Variable to is use in all project
+
+	var mainElement 						= elementGot,								//Element
+		url 								= null,											//Object or URL contain JSON
+		object 								= new Object(),							//Variable to is use in all project
 		dataMethod							= 'GET',										//Requisition method to obatin the data
 		requestData 						= '',												//Form data to send with requisition method POST, only dataMethod = POST
 		baseElement 						= null, 										//Template Element
 		itemsInit 							= 1, 												//Items to show in first loadMore
-		buttonToLoadMore 				= null,											//Element with onclick = loadMore function
-		remainderObject 				= null,											//Remainder Object
-		originalElement 				= null,											//Element before the loadMore transformation
+		buttonToLoadMore 					= null,											//Element with onclick = loadMore function
+		remainderObject 					= null,											//Remainder Object
+		originalElement 					= null,											//Element before the loadMore transformation
 		lastScroll							= 0,												//Last scroll
-		occurringLoadMore				= false,										//Determines whether the load more is running
-		endLoadMore							= false;										//Determine whether load all object's items
-
+		occurringLoadMore					= false,										//Determines whether the load more is running
+		endLoadMore							= false,										//Determine whether load all object's items
+		autoScrolling						= false;
 
 	//End Private Variables -----------------------------------
 
 
 	//Declarate public variables
-	this.minDelay 						= 0; 								//minimun delay to show elements on screen
-	this.itemsPerLoad 				= 1;								//Items to display per load
-	this.loadMoreTimes 				= 0;								//Number of times it was run loadMore function
-	this.scrollToLoadMore 		= false; 						//Load more when focus the end mainElement
-	this.effectOnLoadItems 		= false; 						//Effect to display when you load new items
-	this.autoScroll 					= true; 						//Effect to display when you load new items
+	this.minDelay 							= 0; 							//minimun delay to show elements on screen
+	this.itemsPerLoad 						= 1;							//Items to display per load
+	this.loadMoreTimes 						= 0;							//Number of times it was run loadMore function
+	this.scrollToLoadMore 					= false; 						//Load more when focus the end mainElement
+	this.effectOnLoadItems 					= false; 						//Effect to display when you load new items
+	this.autoScroll 						= false; 						//Effect to display when you load new items
+	this.specificObject 					= null; 						
 
 
 	//End Public Variables -----------------------------------
@@ -113,8 +120,9 @@ function loadMore(elementGot, parameters)
 	//Complment of variableNotExitType
 	var checkSameType = function(name, variable, value) {
 		var type = typeof variable;
+
 		variable = _.variableNotExitType(variable, value);
-		if ( variable === false ) {
+		if ( (variable === false && type != 'boolean') || ( type == 'boolean' && typeof value != 'boolean' ) ) {
 			throwError(2, {
 				'find': ['%p%', '%t%'],
 				'replace': [name, type]
@@ -135,6 +143,8 @@ function loadMore(elementGot, parameters)
 		self.itemsPerLoad 		= checkSameType('itemsPerLoad', self.itemsPerLoad, settings.itemsPerLoad);
 		
 		self.scrollToLoadMore 	= checkSameType('scrollToLoadMore', self.scrollToLoadMore, settings.scrollToLoadMore);
+
+		self.autoScroll 		= checkSameType('autoScroll', self.autoScroll, settings.autoScroll);
 
 		itemsInit 				= checkSameType('itemsInit', itemsInit, settings.itemsInit);
 
@@ -208,7 +218,7 @@ function loadMore(elementGot, parameters)
 		
 		
 		//Adjust buttonToLoadMore
-		//Not Required, but if isset buttonLoadMore... verify
+		//Not Required, but if isset buttonToLoadMore... verify
 		if( settings.buttonToLoadMore != null && settings.buttonToLoadMore != undefined ) {
 
 			var typeButtonLoadMore = typeof settings.buttonToLoadMore;
@@ -308,6 +318,74 @@ function loadMore(elementGot, parameters)
 
 	//End setPluginVariables
 	
+	var autoScroll = function(){
+
+		autoScrolling = true;
+
+		if( self.autoScroll == false ){
+			autoScrolling = false;
+			return false;
+		}
+
+		var position = _.getPositionTop(mainElement.childNodes[mainElement.childNodes.length-1]);
+
+		setTimeout(function(){
+
+			_.scrollTo(position);
+
+			setTimeout(function(){
+				autoScrolling = false;
+			}, 700);
+
+		}, 100);
+
+
+	}
+
+	//set ScrollToLoadMore
+	var setScrollToLoadMore = function() {
+		window.addEventListener('scroll', function(){
+			if( !self.scrollToLoadMore ) {
+				return false;
+			}
+
+			var scrollTop = document.body.scrollTop;
+
+			if( scrollTop < lastScroll ) {
+				lastScroll = scrollTop;
+				return false;
+				
+			}
+
+			lastScroll = scrollTop;
+			
+			var postitionEndMainElement = _.getPositionTop(mainElement) + mainElement.getBoundingClientRect().top*-1;
+
+			if( scrollTop >= postitionEndMainElement && occurringLoadMore == false && endLoadMore == false && autoScrolling == false ) {
+				self.loadMore();
+			}
+
+		});
+	}
+
+	var functionOnClickButtonToLoadMore = function() {
+		self.clickButtonLoadMore();
+		self.loadMore({}, self.itemsPerLoad);
+	}
+
+	//Set On Click to button selected
+	var setOnClickButton = function() {
+
+		if ( buttonToLoadMore != null ) {
+
+			buttonToLoadMore.addEventListener('click', functionOnClickButtonToLoadMore);
+
+
+		}
+
+	} //end SetOnClickButton
+	
+	
 	var getObjectData = function(callback) {
 		
 		if ( _.objLength(object) > 0 ) {
@@ -323,6 +401,7 @@ function loadMore(elementGot, parameters)
 	}
 
 	//End getObject Data
+	
 
 	//List of Errors
 	var errors = [
@@ -347,47 +426,10 @@ function loadMore(elementGot, parameters)
 		throw new Error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
 	}
 
-	//set ScrollToLoadMore
-	var setScrollToLoadMore = function() {
-		window.addEventListener('scroll', function(){
-			if( !self.scrollToLoadMore ) {
-				return false;
-			}
-
-			var scrollTop = document.body.scrollTop;
-
-			if( scrollTop < lastScroll ) {
-				lastScroll = scrollTop;
-				return false;
-				
-			}
-
-			lastScroll = scrollTop;
-			
-			var postitionEndMainElement = _.getPositionTop(mainElement) + mainElement.getBoundingClientRect().top*-1;
-
-			if( scrollTop >= postitionEndMainElement && occurringLoadMore == false && endLoadMore == false ) {
-				self.loadMore();
-			}
-
-		});
+	var consoleError = function(mensage) {
+		console.error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
 	}
 
-	//Set On Click to button selected
-	var setOnClickButton = function() {
-
-		if ( buttonToLoadMore != null ) {
-
-			buttonLoadMore.addEventListener('click', function(){
-				self.clickButtonLoadMore();
-				self.loadMore({}, self.itemsPerLoad);
-			
-
-			});
-
-		}
-
-	} //end SetOnClckButton
 
 
 
@@ -476,9 +518,22 @@ function loadMore(elementGot, parameters)
 	}//end init
 
 
-	var verifyBeforeLoadMore = function(specificLoad, itemsToLoad) {
+	var verifyBeforeLoadMore = function(specificLoad, itemsToLoad, specificObject) {
 		//Initial Definitions
-		var objectInitial = (remainderObject == null) ? object : remainderObject;
+		
+		//Checking specifObject
+		
+		if ( specificObject !=  undefined && specificObject !=  null && typeof specificObject != 'string' ) {
+			consoleError('The argument specificObject must be type of string');
+		}
+
+		if ( specificObject == undefined || specificObject == '' || specificObject == null ) {
+			specificObject = self.specificObject;
+		}
+
+		var gotObject = (remainderObject == null) ? object : remainderObject;
+
+		var objectInitial = gotObject;
 
 		//if not defined the specificLoad, create a empty object
 		specificLoad = ( specificLoad == undefined ) ? new Object() : specificLoad;
@@ -554,64 +609,66 @@ function loadMore(elementGot, parameters)
 
 	} //End startEffects
 
-	var endEffects = function() {
+	var endEffects = function(callback) {
 		if( self.effectOnLoadItems == false ) {
-			occurringLoadMore = false;
+			callback(false);
 			return false;
 		}
 
-			setTimeout(function(){
+		var effects = {
+
+			fadeIn: function() {
+
 				for ( var i = 0; i < mainElement.childNodes.length; i++ ) {
 					if ( mainElement.childNodes[i] == undefined || mainElement.childNodes[i].style == undefined ) {
 						continue;
 					}
-
-					mainElement.childNodes[i].style.height = '';
-					mainElement.childNodes[i].style.width = '';
-					mainElement.childNodes[i].style.margin = '';
-					mainElement.childNodes[i].style.padding = '';
-
+					mainElement.childNodes[i].style.opacity = '';
 				}
 
-				//Effect FadeIn
-				
-				if( self.effectOnLoadItems == 'fadeIn' ) {
+			},
 
-					setTimeout(function(){
-						for ( var i = 0; i < mainElement.childNodes.length; i++ ) {
-							if ( mainElement.childNodes[i] == undefined || mainElement.childNodes[i].style == undefined ) {
-								continue;
-							}
-							mainElement.childNodes[i].style.opacity = '';
-						}
+			zoomIn: function() {
+				for ( var i = 0; i < mainElement.childNodes.length; i++ ) {
+					if ( mainElement.childNodes[i] == undefined || mainElement.childNodes[i].style == undefined ) {
+						continue;
+					}
+					mainElement.childNodes[i].style.opacity = '';
+					mainElement.childNodes[i].style.transform = '';
+				}
 
-						mainElement.style.transition = '';
-						occurringLoadMore = false;
-
-					}, 500);
-
-					//End FadeIn
-				} else if ( self.effectOnLoadItems == 'zoomIn' ) {
-					//Effect zoomIn
-					
-					setTimeout(function(){
-						for ( var i = 0; i < mainElement.childNodes.length; i++ ) {
-							if ( mainElement.childNodes[i] == undefined || mainElement.childNodes[i].style == undefined ) {
-								continue;
-							}
-							mainElement.childNodes[i].style.opacity = '';
-							mainElement.childNodes[i].style.transform = '';
-						}
-
-						mainElement.style.transition = '';
-						occurringLoadMore = false;
-
-					}, 500);
+			}
 
 
-				} 	//End zoomIn
 
-			}, 500);
+		}
+
+		setTimeout(function(){
+
+			for ( var i = 0; i < mainElement.childNodes.length; i++ ) {
+				if ( mainElement.childNodes[i] == undefined || mainElement.childNodes[i].style == undefined ) {
+					continue;
+				}
+
+				mainElement.childNodes[i].style.height = '';
+				mainElement.childNodes[i].style.width = '';
+				mainElement.childNodes[i].style.margin = '';
+				mainElement.childNodes[i].style.padding = '';
+
+			}
+
+			if( typeof effects[self.effectOnLoadItems] == 'function' ){
+
+				setTimeout(function(){
+					effects[self.effectOnLoadItems]();
+					mainElement.style.transition = '';
+					callback(true);				
+				}, 500);
+
+			}
+
+
+		}, 300);
 
 
 
@@ -626,14 +683,14 @@ function loadMore(elementGot, parameters)
 
 
 	//Main function to load more	
-	this.loadMore = function(specificLoad, itemsToLoad) {
+	this.loadMore = function(specificLoad, itemsToLoad, specificObject) {
 
 		//Before LoadMore
 		occurringLoadMore = true;
 		self.beforeLoadMore(self.loadMoreTimes);
 
 		//get variables after, check arguments
-		var checkedArguments = verifyBeforeLoadMore(specificLoad, itemsToLoad);
+		var checkedArguments = verifyBeforeLoadMore(specificLoad, itemsToLoad, specificObject);
 
 		var objectInitial = checkedArguments.objectInitial;
 
@@ -669,9 +726,9 @@ function loadMore(elementGot, parameters)
 
 			objectsLoaded.push(current);
 
-			var item = baseElement.cloneNode(true);
+			var item;
 
-			var itemHTML = _.getCompleteHTML(item);
+			var itemHTML = _.getCompleteHTML(baseElement);
 
 			var splitReplacer = (pluginDefinitions.replacerKeys).split('%s%');
 
@@ -703,7 +760,10 @@ function loadMore(elementGot, parameters)
 		setTimeout(function(){
 			insertNewElementsInMainElement(items.innerHTML);
 
-			endEffects();
+			endEffects(function(){
+				autoScroll();
+				occurringLoadMore = false;
+			});
 
 
 			//After LoadMore
@@ -734,6 +794,25 @@ function loadMore(elementGot, parameters)
 	//Destroy Function mainElement turn orignalElement
 	this.destroy = function() {
 		mainElement.innerHTML = originalElement.innerHTML;
+	}
+
+	//Remove Events: click or scroll
+	this.removeEvents = function(event) {
+		
+		if ( event == undefined || typeof event != 'string' || availableRemoveEvents.indexOf(event) == -1 ) {
+			consoleError('Set the event to remove this event. Available events are: '+availableRemoveEvents.join(', '));
+			return false;
+		}
+
+		
+		if ( event == 'buttonToLoadMore' && buttonToLoadMore != null ) {
+			buttonToLoadMore.removeEventListener('click', functionOnClickButtonToLoadMore);
+		}
+
+		else if ( event == 'scrollToLoadMore' ) {
+			self.scrollToLoadMore = false;
+		}
+
 	}
 
 	//End Public Functions -----------------------------------
@@ -972,6 +1051,34 @@ function loadMore(elementGot, parameters)
 
 			    return offset;
 
+		},
+		//scroll animation
+		scrollTo: function(target, duration){
+			var timer, start, factor;
+		
+		    var offset = window.pageYOffset,
+		    delta  = target - window.pageYOffset; // Y-offset difference
+		    duration = 500 || 1000;              // default 1 sec animation
+		    start = Date.now();                       // get start time
+		    factor = 0;
+
+		    if( timer ) {
+		      clearInterval(timer); // stop any running animation
+		    }
+
+		    function step() {
+		      var y;
+		      factor = (Date.now() - start) / 500; // get interpolation factor
+		      if( factor >= 1 ) {
+		        clearInterval(timer); // stop animation
+		        factor = 1;           // clip to max 1.0
+		      } 
+		      y = factor * delta + offset;
+		      window.scrollBy(0, y - window.pageYOffset);
+		    }
+
+		    timer = setInterval(step, 10);
+		    return timer; // return the interval timer, so you can clear it elsewhere
 		}
 
 
