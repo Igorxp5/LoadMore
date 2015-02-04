@@ -48,6 +48,7 @@ function loadMore(elementGot, parameters)
 		autoScroll: false,
 		minDelay: 0,
 		effectOnLoadItems: false,
+		specificObject: null,
 		onLoadData: function(object) {
 			void(0);
 		},
@@ -296,6 +297,29 @@ function loadMore(elementGot, parameters)
 		
 		//End Adjust postData----------------------------------
 		
+		//Adjust SpecificObject
+		
+		if( settings.specificObject != null ) {
+
+			var typeSpecificObject = typeof settings.specificObject;
+
+			var regexpSpecificObject = /\[([^\[,\]]{1,})\]/g;
+
+			if ( typeSpecificObject != 'string' ) {
+				throwError(2, {
+					'find': ['%p%', '%t%'],
+					'replace': ['specificObject', 'string']
+				});
+			}else if ( (regexpSpecificObject.exec(settings.specificObject)) == null ) {
+				throwError(7);
+			}else {
+
+				self.specificObject = _.getPartOfObject(settings.specificObject, object);
+
+			}
+
+		}
+		
 	
 		//Set Original Element
 		originalElement = mainElement.cloneNode(0);
@@ -418,7 +442,9 @@ function loadMore(elementGot, parameters)
 		//Code: 5
 		"Not exists this effect, the available effects are: "+availableEffects.join(', '),
 		//Code: 6
-		"In function %f% - The %a% must be of type %t%"
+		"In function %f% - The %a% must be of type %t%",
+		//Code: 7
+		"The parameter specificObject must be build so: ' [key1][key2][key...] '"
 	];
 
 	var throwError = function(code, s) {
@@ -469,13 +495,14 @@ function loadMore(elementGot, parameters)
 				throwError(1);
 			}
 
+
 			//checks were setted the required parameters
 			for (var key in parameters) {
 
 				if ( settings.hasOwnProperty(key) ) {
 					
 					//if current parameter is object, do other method
-					if( typeof parameters[key] == 'object' && ( !_.isElement(parameters[key]) ) ){
+					if( typeof parameters[key] == 'object' && ( !_.isElement(parameters[key]) ) && typeof settings[key] == 'object' && settings[key] != null ){
 						
 						for( var k in parameters[key] ) {
 							settings[key][k] = parameters[key][k];
@@ -521,8 +548,8 @@ function loadMore(elementGot, parameters)
 	var verifyBeforeLoadMore = function(specificLoad, itemsToLoad, specificObject) {
 		//Initial Definitions
 		
-		//Checking specifObject
-		
+		//Checking specificObject
+				
 		if ( specificObject !=  undefined && specificObject !=  null && typeof specificObject != 'string' ) {
 			consoleError('The argument specificObject must be type of string');
 		}
@@ -531,9 +558,9 @@ function loadMore(elementGot, parameters)
 			specificObject = self.specificObject;
 		}
 
-		var gotObject = (remainderObject == null) ? object : remainderObject;
+		console.log(specificObject);
 
-		var objectInitial = gotObject;
+		var objectInitial = (remainderObject == null) ? ( (specificObject == null) ? object : specificObject ) : remainderObject;
 
 		//if not defined the specificLoad, create a empty object
 		specificLoad = ( specificLoad == undefined ) ? new Object() : specificLoad;
@@ -1079,6 +1106,38 @@ function loadMore(elementGot, parameters)
 
 		    timer = setInterval(step, 10);
 		    return timer; // return the interval timer, so you can clear it elsewhere
+		
+		},
+
+		getPartOfObject: function(exp, object) {
+			var re = /\[([^\[,\]]{1,})\]/g; 
+		    var m;
+
+		    var newObject = object;
+		    while ((m = re.exec(exp)) != null) {
+
+		      var key = m[1];
+
+		      newObject = newObject[key];
+		       
+		    }
+
+		    return newObject;
+		},
+
+		isBidimensionalObject: function(object) {
+			for( var key in object ) {
+
+				for( var k in object[key]  ) {
+					if( typeof object[key][k] == 'object' || typeof object[key][k] == 'array' ){
+						return false;
+					}
+				
+				}
+
+			}
+
+			return true;
 		}
 
 

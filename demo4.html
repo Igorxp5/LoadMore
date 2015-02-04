@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 	<meta charset="UTF-8">
-	<title>Load More 2.0 - Demo 5</title>
+	<title>Load More 2.0 - Demo 4</title>
 	<link rel="stylesheet" href="css/components.css">
 	<link rel="stylesheet" href="css/demo.css">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:700,300,400' rel='stylesheet' type='text/css'>
@@ -24,11 +24,42 @@
 		
 		<section id="content" class="content">
 
-			<center>Em desenvolvimento</center>
+			<div id="demo4" class="demo">
+					<figure id="baseElement" class="gallery-image">
+						<img src="{{@img}}" title="{{@title}}" alt="{{@title}}">
+						<figcaption>{{@title}}</figcaption>
+					</figure>
+			</div>
+
+			<button id="buttonLoadMore" class="buttonLoadMore">Load More</button>
 
 		</section>
 		
 	</div>
+
+	<script src="js/loadMore.js"></script>
+
+	<script>
+
+	
+		var $demo4 = document.querySelector('#demo4');
+
+		var $content = $demo4.loadMore({
+			config: {
+				object: 'json/demo4.json',
+			},
+			itemsInit:1,
+			itemsPerLoad: 1,
+			baseElement: '#baseElement',
+			buttonToLoadMore: '#buttonLoadMore',
+			effectOnLoadItems:'fadeIn',
+			specifcObject: '[corporativo]'
+		});
+
+
+		console.log($content);
+
+	</script>
 
 </body>
 </html>
