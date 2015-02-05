@@ -86,20 +86,20 @@ function loadMore(elementGot, parameters)
 	]; 
 
 
-	var mainElement 						= elementGot,								//Element
-		url 								= null,											//Object or URL contain JSON
-		object 								= new Object(),							//Variable to is use in all project
-		dataMethod							= 'GET',										//Requisition method to obatin the data
-		requestData 						= '',												//Form data to send with requisition method POST, only dataMethod = POST
-		baseElement 						= null, 										//Template Element
-		itemsInit 							= 1, 												//Items to show in first loadMore
-		buttonToLoadMore 					= null,											//Element with onclick = loadMore function
-		remainderObject 					= null,											//Remainder Object
-		originalElement 					= null,											//Element before the loadMore transformation
-		lastScroll							= 0,												//Last scroll
-		occurringLoadMore					= false,										//Determines whether the load more is running
-		endLoadMore							= false,										//Determine whether load all object's items
-		autoScrolling						= false;
+	var mainElement 							= elementGot,								//Element
+			url 											= null,											//Object or URL contain JSON
+			object 										= new Object(),							//Variable to is use in all project
+			dataMethod								= 'GET',										//Requisition method to obatin the data
+			requestData 							= '',												//Form data to send with requisition method POST, only dataMethod = POST
+			baseElement 							= null, 										//Template Element
+			itemsInit 								= 1, 												//Items to show in first loadMore
+			buttonToLoadMore 					= null,											//Element with onclick = loadMore function
+			remainderObject 					= null,											//Remainder Object
+			originalElement 					= null,											//Element before the loadMore transformation
+			lastScroll								= 0,												//Last scroll
+			occurringLoadMore					= false,										//Determines whether the load more is running
+			endLoadMore								= false,										//Determine whether load all object's items
+			autoScrolling							= false;
 
 	//End Private Variables -----------------------------------
 
@@ -784,6 +784,10 @@ function loadMore(elementGot, parameters)
 				//HTML Replace
 				itemHTML = itemHTML.replace(new RegExp(replacer, 'g'), current[k]);
 
+				//Exceptions
+				//Change data-src to src
+				itemHTML = itemHTML.replace(new RegExp('data-src', 'g'), 'src');
+
 			}
 
 			//Return the new HTML ELement
@@ -869,11 +873,15 @@ function loadMore(elementGot, parameters)
 
 	}
 
+	//Setters e Getters
+
 	//Get Name of SpecficObject, without []
 	this.getNameSpecificObject = function() {
 		var regex = new RegExp(/\[([^\[,\]]{1,})\]/g);
 		return regex.exec(self.specificObject)[1];
 	}
+
+	//End Setters e Getters
 
 	//End Public Functions -----------------------------------
 
