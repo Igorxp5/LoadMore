@@ -724,6 +724,11 @@ function loadMore(elementGot, parameters)
 
 	//Main function to load more	
 	this.loadMore = function(specificLoad, itemsToLoad, specificObject) {
+		//Verify whether occurring a loadMore function, if yes, abort this function
+		if ( occurringLoadMore ) {
+			return false;
+		}
+
 
 		//Before LoadMore
 		occurringLoadMore = true;
@@ -741,7 +746,7 @@ function loadMore(elementGot, parameters)
 
 		var specificObject = checkedArguments.specificObject;
 
-		if( !checkedArguments ) {
+		if ( !checkedArguments ) {
 			occurringLoadMore = false;
 			return false;
 		}
