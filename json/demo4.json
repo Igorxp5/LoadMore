@@ -23,42 +23,42 @@
 
 	"shows": [
 		{
-			"title": "Corporativo 4",
+			"title": "Shows 4",
 			"desc": "Descrção 4",
-			"img": "img/4.jpg"
+			"img": "img/4.png"
 		},
 
 		{
-			"title": "Corporativo 5",
+			"title": "Shows 5",
 			"desc": "Descrção 5",
 			"img": "img/5.jpg"
 		},
 
 		{
-			"title": "Corporativo 6",
+			"title": "Shows 6",
 			"desc": "Descrção 6",
-			"img": "img/6.jpg"
+			"img": "img/7.jpg"
 		}
 
 	],
 
 	"jornalismo": [
 		{
-			"title": "Corporativo 7",
+			"title": "Jornalismo 7",
 			"desc": "Descrção 7",
-			"img": "img/7.jpg"
-		},
-
-		{
-			"title": "Corporativo 8",
-			"desc": "Descrção 8",
 			"img": "img/8.jpg"
 		},
 
 		{
-			"title": "Corporativo 9",
-			"desc": "Descrção 9",
+			"title": "Jornalismo 8",
+			"desc": "Descrção 8",
 			"img": "img/9.png"
+		},
+
+		{
+			"title": "Jornalismo 9",
+			"desc": "Descrção 9",
+			"img": "img/10.jpg"
 		}
 
 	]

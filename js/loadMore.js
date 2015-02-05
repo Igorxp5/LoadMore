@@ -24,7 +24,7 @@ function loadMore(elementGot, parameters)
 	//Setting definitions of plugin
 	var pluginDefinitions = {
 		name: 'Load More',
-		pluginVersion: '2.1',
+		version: '2.1',
 		//String to be replaced for key in foreach
 		replacerKeys:'{{@%s%}}'
 	}
@@ -105,12 +105,12 @@ function loadMore(elementGot, parameters)
 
 
 	//Declarate public variables
-	this.minDelay 							= 0; 							//minimun delay to show elements on screen
+	this.minDelay 								= 0; 							//minimun delay to show elements on screen
 	this.itemsPerLoad 						= 1;							//Items to display per load
 	this.loadMoreTimes 						= 0;							//Number of times it was run loadMore function
-	this.scrollToLoadMore 					= false; 						//Load more when focus the end mainElement
-	this.effectOnLoadItems 					= false; 						//Effect to display when you load new items
-	this.autoScroll 						= false; 						//Effect to display when you load new items
+	this.scrollToLoadMore 				= false; 						//Load more when focus the end mainElement
+	this.effectOnLoadItems 				= false; 						//Effect to display when you load new items
+	this.autoScroll 							= false; 						//Effect to display when you load new items
 	this.specificObject 					= null; 						
 
 
@@ -298,6 +298,7 @@ function loadMore(elementGot, parameters)
 		//End Adjust postData----------------------------------
 		
 		//Adjust SpecificObject
+			
 		
 		if( settings.specificObject != null ) {
 
@@ -310,11 +311,11 @@ function loadMore(elementGot, parameters)
 					'find': ['%p%', '%t%'],
 					'replace': ['specificObject', 'string']
 				});
-			}else if ( (regexpSpecificObject.exec(settings.specificObject)) == null ) {
+			}else if ( regexpSpecificObject.exec(settings.specificObject) == null ) {
 				throwError(7);
 			}else {
 
-				self.specificObject = _.getPartOfObject(settings.specificObject, object);
+				self.specificObject = settings.specificObject;
 
 			}
 
@@ -444,16 +445,20 @@ function loadMore(elementGot, parameters)
 		//Code: 6
 		"In function %f% - The %a% must be of type %t%",
 		//Code: 7
-		"The parameter specificObject must be build so: ' [key1][key2][key...] '"
+		"The parameter specificObject must be build so: ' [key1][key2][key...] '",
+		//Code: 8
+		"Obtained object isn't two-dimensional, in this case it's mandatory to use the property specificObject"
 	];
 
 	var throwError = function(code, s) {
+		var pluginName = pluginDefinitions.name + ' ' + pluginDefinitions.version;
 		var mensage = ( s != undefined ) ? _.replaceArray(errors[code], s['find'], s['replace']) : errors[code];
-		throw new Error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
+		throw new Error( pluginName + ' - ' + mensage + '.' );
 	}
 
 	var consoleError = function(mensage) {
-		console.error( pluginDefinitions.pluginName + ' - ' + mensage + '.' );
+		var pluginName = pluginDefinitions.name + ' ' + pluginDefinitions.version;
+		console.error( pluginName + ' - ' + mensage + '.' );
 	}
 
 
@@ -526,9 +531,16 @@ function loadMore(elementGot, parameters)
 		getObjectData(function(r){
 			
 			if( r ) {
-				if ( typeof r != 'oject' ) {
+				if ( typeof r != 'object' ) {
 					object = JSON.parse(r);
 				}
+
+				//verify object level
+				if( !_.isBidimensionalObject(object) && self.specificObject == null ) {
+					throwError(8);
+				}
+
+
 			}
 
 			self.onLoadData(object);
@@ -558,9 +570,9 @@ function loadMore(elementGot, parameters)
 			specificObject = self.specificObject;
 		}
 
-		console.log(specificObject);
+		var objectInitial = (remainderObject == null) ?  object : remainderObject;
 
-		var objectInitial = (remainderObject == null) ? ( (specificObject == null) ? object : specificObject ) : remainderObject;
+		objectInitial = ( specificObject != null ) ? _.getPartOfObject(specificObject, objectInitial) : objectInitial;
 
 		//if not defined the specificLoad, create a empty object
 		specificLoad = ( specificLoad == undefined ) ? new Object() : specificLoad;
@@ -592,7 +604,8 @@ function loadMore(elementGot, parameters)
 		return {
 			'objectInitial': objectInitial,
 			'specificLoad': specificLoad,
-			'itemsToLoad': itemsToLoad
+			'itemsToLoad': itemsToLoad,
+			'specificObject': specificObject
 		}
 
 
@@ -714,6 +727,7 @@ function loadMore(elementGot, parameters)
 
 		//Before LoadMore
 		occurringLoadMore = true;
+
 		self.beforeLoadMore(self.loadMoreTimes);
 
 		//get variables after, check arguments
@@ -724,6 +738,8 @@ function loadMore(elementGot, parameters)
 		var specificLoad = checkedArguments.specificLoad;
 
 		var itemsToLoad = checkedArguments.itemsToLoad;
+
+		var specificObject = checkedArguments.specificObject;
 
 		if( !checkedArguments ) {
 			occurringLoadMore = false;
@@ -783,6 +799,17 @@ function loadMore(elementGot, parameters)
 		//recreates the remainderObject
 		remainderObject = _.severalSplice(objectInitial, objectsLoaded);
 
+		if( specificObject != null ) {
+			var regex = new RegExp(/\[([^\[,\]]{1,})\]/g);
+			var keySpecificObject = regex.exec(specificObject)[1];
+			var objectValue = object;
+
+			objectValue[keySpecificObject] = remainderObject;
+
+			remainderObject = objectValue;
+		
+		}
+
 		//Add new Elements in Main Element, waiting for minDelay Time
 		setTimeout(function(){
 			insertNewElementsInMainElement(items.innerHTML);
@@ -806,8 +833,8 @@ function loadMore(elementGot, parameters)
 			self.loadMoreTimes++;
 			self.afterLoadMore(itemsLoaded, self.loadMoreTimes);
 
-			//if it's last LoadMore, execute the callback lastLoadMore 
-			if( _.objLength(remainderObject) == 0 ) {
+			//if it's last LoadMore, execute the callback lastLoadMore
+			if( (specificObject != null) ? (_.objLength(_.getPartOfObject(specificObject, remainderObject)) == 0) : (_.objLength(remainderObject) == 0) ) {
 				self.lastLoadMore(itemsLoaded);
 				endLoadMore = true;
 			}
@@ -840,6 +867,12 @@ function loadMore(elementGot, parameters)
 			self.scrollToLoadMore = false;
 		}
 
+	}
+
+	//Get Name of SpecficObject, without []
+	this.getNameSpecificObject = function() {
+		var regex = new RegExp(/\[([^\[,\]]{1,})\]/g);
+		return regex.exec(self.specificObject)[1];
 	}
 
 	//End Public Functions -----------------------------------
@@ -1110,19 +1143,19 @@ function loadMore(elementGot, parameters)
 		},
 
 		getPartOfObject: function(exp, object) {
-			var re = /\[([^\[,\]]{1,})\]/g; 
-		    var m;
+			var re = /\[([^\[,\]]{1,})\]/g,
+					m,
+					newObject = object;
 
-		    var newObject = object;
-		    while ((m = re.exec(exp)) != null) {
+	    while ((m = re.exec(exp)) != null) {
 
-		      var key = m[1];
+	      var key = m[1];
 
-		      newObject = newObject[key];
-		       
-		    }
+	      newObject = newObject[key];
+	       
+	    }
 
-		    return newObject;
+	    return newObject;
 		},
 
 		isBidimensionalObject: function(object) {
@@ -1138,6 +1171,7 @@ function loadMore(elementGot, parameters)
 			}
 
 			return true;
+		
 		}
 
 
