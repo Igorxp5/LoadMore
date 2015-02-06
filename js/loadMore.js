@@ -45,6 +45,7 @@ function loadMore(elementGot, parameters)
 		buttonToLoadMore: null,
 		baseElement: null,
 		scrollToLoadMore: false,
+		waitLoadMore: true,
 		autoScroll: false,
 		minDelay: 0,
 		effectOnLoadItems: false,
@@ -87,31 +88,32 @@ function loadMore(elementGot, parameters)
 
 
 	var mainElement 							= elementGot,								//Element
-			url 											= null,											//Object or URL contain JSON
-			object 										= new Object(),							//Variable to is use in all project
-			dataMethod								= 'GET',										//Requisition method to obatin the data
-			requestData 							= '',												//Form data to send with requisition method POST, only dataMethod = POST
-			baseElement 							= null, 										//Template Element
-			itemsInit 								= 1, 												//Items to show in first loadMore
-			buttonToLoadMore 					= null,											//Element with onclick = loadMore function
-			remainderObject 					= null,											//Remainder Object
-			originalElement 					= null,											//Element before the loadMore transformation
-			lastScroll								= 0,												//Last scroll
-			occurringLoadMore					= false,										//Determines whether the load more is running
-			endLoadMore								= false,										//Determine whether load all object's items
-			autoScrolling							= false;
+		url 									= null,											//Object or URL contain JSON
+		object 									= new Object(),							//Variable to is use in all project
+		dataMethod								= 'GET',										//Requisition method to obatin the data
+		requestData 							= '',												//Form data to send with requisition method POST, only dataMethod = POST
+		baseElement 							= null, 										//Template Element
+		itemsInit 								= 1, 												//Items to show in first loadMore
+		buttonToLoadMore 						= null,											//Element with onclick = loadMore function
+		remainderObject 						= null,											//Remainder Object
+		originalElement 						= null,											//Element before the loadMore transformation
+		lastScroll								= 0,												//Last scroll
+		occurringLoadMore						= false,										//Determines whether the load more is running
+		endLoadMore								= false,										//Determine whether load all object's items
+		autoScrolling							= false;
 
 	//End Private Variables -----------------------------------
 
 
 	//Declarate public variables
 	this.minDelay 								= 0; 							//minimun delay to show elements on screen
-	this.itemsPerLoad 						= 1;							//Items to display per load
-	this.loadMoreTimes 						= 0;							//Number of times it was run loadMore function
-	this.scrollToLoadMore 				= false; 						//Load more when focus the end mainElement
-	this.effectOnLoadItems 				= false; 						//Effect to display when you load new items
+	this.itemsPerLoad 							= 1;							//Items to display per load
+	this.loadMoreTimes 							= 0;							//Number of times it was run loadMore function
+	this.scrollToLoadMore 						= false; 						//Load more when focus the end mainElement
+	this.effectOnLoadItems 						= false; 						//Effect to display when you load new items
 	this.autoScroll 							= false; 						//Effect to display when you load new items
-	this.specificObject 					= null; 						
+	this.specificObject 						= null;						
+	this.waitLoadMore	 						= true;						
 
 
 	//End Public Variables -----------------------------------
@@ -144,6 +146,8 @@ function loadMore(elementGot, parameters)
 		self.itemsPerLoad 		= checkSameType('itemsPerLoad', self.itemsPerLoad, settings.itemsPerLoad);
 		
 		self.scrollToLoadMore 	= checkSameType('scrollToLoadMore', self.scrollToLoadMore, settings.scrollToLoadMore);
+
+		self.waitLoadMore 		= checkSameType('waitLoadMore', self.waitLoadMore, settings.waitLoadMore);
 
 		self.autoScroll 		= checkSameType('autoScroll', self.autoScroll, settings.autoScroll);
 
@@ -570,6 +574,13 @@ function loadMore(elementGot, parameters)
 			specificObject = self.specificObject;
 		}
 
+		//Check format of specificObject
+		var regexpSpecificObject = /\[([^\[,\]]{1,})\]/g;
+
+		if ( regexpSpecificObject.exec(specificObject) == null ) {
+				consoleError('The format to specificObject is: "[%variable%]"');
+		}
+
 		var objectInitial = (remainderObject == null) ?  object : remainderObject;
 
 		objectInitial = ( specificObject != null ) ? _.getPartOfObject(specificObject, objectInitial) : objectInitial;
@@ -725,7 +736,7 @@ function loadMore(elementGot, parameters)
 	//Main function to load more	
 	this.loadMore = function(specificLoad, itemsToLoad, specificObject) {
 		//Verify whether occurring a loadMore function, if yes, abort this function
-		if ( occurringLoadMore ) {
+		if ( occurringLoadMore && self.waitLoadMore == true ) {
 			return false;
 		}
 
@@ -738,6 +749,12 @@ function loadMore(elementGot, parameters)
 		//get variables after, check arguments
 		var checkedArguments = verifyBeforeLoadMore(specificLoad, itemsToLoad, specificObject);
 
+		//Check return false of checkedArguments
+		if ( !checkedArguments ) {
+			occurringLoadMore = false;
+			return false;
+		}
+
 		var objectInitial = checkedArguments.objectInitial;
 
 		var specificLoad = checkedArguments.specificLoad;
@@ -746,10 +763,6 @@ function loadMore(elementGot, parameters)
 
 		var specificObject = checkedArguments.specificObject;
 
-		if ( !checkedArguments ) {
-			occurringLoadMore = false;
-			return false;
-		}
 
 		//Run LoadMore
 		
@@ -811,7 +824,7 @@ function loadMore(elementGot, parameters)
 		if( specificObject != null ) {
 			var regex = new RegExp(/\[([^\[,\]]{1,})\]/g);
 			var keySpecificObject = regex.exec(specificObject)[1];
-			var objectValue = object;
+			var objectValue = _.cloneObject(object);
 
 			objectValue[keySpecificObject] = remainderObject;
 
@@ -857,6 +870,10 @@ function loadMore(elementGot, parameters)
 	//Destroy Function mainElement turn orignalElement
 	this.destroy = function() {
 		mainElement.innerHTML = originalElement.innerHTML;
+	}
+
+	this.restart = function() {
+		remainderObject = null;
 	}
 
 	//Remove Events: click or scroll
@@ -1086,7 +1103,8 @@ function loadMore(elementGot, parameters)
 				return array;
 			}
 
-			var array = a;
+			var array = a.slice(0);
+
 
 			for( var k in search ){
 				var index = array.indexOf(search[k]);
@@ -1185,6 +1203,17 @@ function loadMore(elementGot, parameters)
 
 			return true;
 		
+		},
+
+		cloneObject: function(o) {
+			var r = new Object();
+
+			for( var k in o ) {
+				r[k] = o[k];
+			}
+
+			return r;
+
 		}
 
 

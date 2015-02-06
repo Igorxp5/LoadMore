@@ -54,6 +54,7 @@
 			itemsPerLoad: 1,
 			baseElement: '#baseElement',
 			buttonToLoadMore: '#buttonLoadMore',
+			waitLoadMore: false,
 			effectOnLoadItems:'fadeIn',
 			specificObject: '[corporativo]',
 			onLoadData: function(object) {
@@ -75,6 +76,9 @@
 
 				if( categorias[nextCategory] != undefined ) {
 					$content.specificObject = '['+categorias[nextCategory]+']';
+				} else {
+					$content.restart();
+					$content.specificObject = '['+categorias[0]+']';
 				}
 
 			}
