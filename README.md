@@ -6,10 +6,6 @@ Com ele é possível criar estruturas HTML e usar variáveis para serem substitu
 
 *O plugin não necessita do **Jquery**. E não pode ser chamado usando um **elemento Jquery.***
 
-##Novidades da verão 2.1
-```
-
-```
 
 ## Como Usar
 
