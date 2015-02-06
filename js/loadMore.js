@@ -4,7 +4,7 @@
  *
  * 
  * Author: Igor Fernandes
- * Version:  2.0-dev
+ * Version:  2.1-dev
  * License: LCS
  *
  * Copyright 2015
@@ -589,7 +589,7 @@ function loadMore(elementGot, parameters)
 		specificLoad = ( specificLoad == undefined ) ? new Object() : specificLoad;
 
 		//if not defined the specificLoad, use the variable itemsPerLoad
-		itemsToLoad = ( itemsToLoad == undefined ) ? self.itemsPerLoad : itemsToLoad
+		itemsToLoad = ( itemsToLoad == undefined || itemsToLoad == null ) ? self.itemsPerLoad : itemsToLoad
 
 		//Verification of arguments
 
@@ -874,25 +874,6 @@ function loadMore(elementGot, parameters)
 
 	this.restart = function() {
 		remainderObject = null;
-	}
-
-	//Remove Events: click or scroll
-	this.removeEvents = function(event) {
-		
-		if ( event == undefined || typeof event != 'string' || availableRemoveEvents.indexOf(event) == -1 ) {
-			consoleError('Set the event to remove this event. Available events are: '+availableRemoveEvents.join(', '));
-			return false;
-		}
-
-		
-		if ( event == 'buttonToLoadMore' && buttonToLoadMore != null ) {
-			buttonToLoadMore.removeEventListener('click', functionOnClickButtonToLoadMore);
-		}
-
-		else if ( event == 'scrollToLoadMore' ) {
-			self.scrollToLoadMore = false;
-		}
-
 	}
 
 	//Setters e Getters
