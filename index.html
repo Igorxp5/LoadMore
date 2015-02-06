@@ -26,7 +26,7 @@
 
 			<div id="demo1" class="demo">
 					<figure id="baseElement" class="gallery-image">
-						<img src="{{@img}}" title="{{@title}}" alt="{{@title}}">
+						<img data-src="{{@img}}" title="{{@title}}" alt="{{@title}}">
 						<figcaption>{{@title}}</figcaption>
 					</figure>
 			</div>
@@ -53,11 +53,13 @@
 			itemsInit:3,
 			itemsPerLoad: 3,
 			baseElement: '#baseElement',
+			autoScroll: true,
 			effectOnLoadItems:'fadeIn',
 			buttonToLoadMore: '#buttonLoadMore'
 		});
 
-
+		$demo1.removeEvents('buttonToLoadMore');
+		
 		console.log($demo1);
 
 	</script>

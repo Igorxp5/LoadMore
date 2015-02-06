@@ -24,11 +24,39 @@
 		
 		<section id="content" class="content">
 
-			<center>Em desenvolvimento</center>
-
+			<div id="demo3" class="demo">
+					<figure id="baseElement" class="gallery-image">
+						<img data-src="{{@img}}" title="{{@title}}" alt="{{@title}}">
+						<figcaption>{{@title}}</figcaption>
+					</figure>
+			</div>
+			
 		</section>
 		
 	</div>
+
+	<script src="js/loadMore.min.js"></script>
+
+	<script>
+
+	
+		var $demo3 = document.querySelector('#demo3');
+
+		var $content = $demo3.loadMore({
+			config: {
+				object: 'json/data.json',
+			},
+			itemsInit:3,
+			itemsPerLoad: 3,
+			baseElement: '#baseElement',
+			effectOnLoadItems:'fadeIn',
+			scrollToLoadMore: true
+		});
+
+
+		console.log($content);
+
+	</script>
 
 </body>
 </html>
