@@ -423,6 +423,11 @@ Reinicia o LoadMore, fazendo com que o próximo item a ser carregado, seja o pri
 
 *Ou seja apagar apaga da memória os itens já carregados.*
 
+Exemplos:
+http://igorxp5.github.io/LoadMore/. 
+
+**Obs.:** Para vê o código, use o Ctrl+U no Chrome para vê o código fonte.
+
 ----
 
 Author
